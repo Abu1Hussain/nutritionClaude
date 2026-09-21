@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriFit - Advanced Macro Calculator & AI Meal Planner</title>
+  <meta name="description"
+    content="Calculate your daily calorie and macronutrient targets, explore food nutrition micro/macros, read health guidelines, and generate customized AI meal plans without allergens.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="logo">
+        <div class="logo-icon">🥗</div>
+        <div class="logo-text">Nutri<span>Fit</span></div>
+      </div>
+      <nav class="nav-links">
+        <a href="#calculator-section" class="active">Calculator</a>
+        <a href="#food-lookup-section">Food Search</a>
+        <a href="#ai-planner-section">AI Meal Plan</a>
+      </nav>
+      <button id="open-guide-btn" class="btn btn-outline glow-effect">
+        <span class="btn-icon">📘</span> Health & Sugar Guide
+      </button>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <!-- Hero Banner -->
+    <section class="hero-section">
+      <div class="hero-badge">⚡ Precision Nutrition & Health Engine</div>
+      <h1 class="hero-title">Optimize Your Diet with Precision Macros & AI Meal Planning</h1>
+      <p class="hero-subtitle">Calculate personalized daily macronutrient ranges, search food micros, and get tailored
+        AI-crafted meal options tailored to your exact target goals and allergies.</p>
+    </section>
+
+    <!-- Calculator Section -->
+    <section id="calculator-section" class="section-card">
+      <div class="section-header">
+        <h2>1. Personal Macro & Calorie Calculator</h2>
+        <p>Input your physical stats and weight goals to establish accurate daily caloric and macronutrient boundaries.
+        </p>
+      </div>
+
+      <form id="macro-form" class="calculator-grid">
+        <!-- Age -->
+        <div class="form-group">
+          <label for="age">Age (years)</label>
+          <input type="number" id="age" min="15" max="100" value="25" required placeholder="e.g. 25">
+        </div>
+
+        <!-- Gender -->
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+
+        <!-- Weight -->
+        <div class="form-group">
+          <label for="weight">Weight (kg)</label>
+          <input type="number" id="weight" step="0.1" min="30" max="250" value="70" required placeholder="e.g. 70">
+        </div>
+
+        <!-- Height -->
+        <div class="form-group">
+          <label for="height">Height (cm)</label>
+          <input type="number" id="height" min="100" max="230" value="175" required placeholder="e.g. 175">
+        </div>
+
+        <!-- Activity Level -->
+        <div class="form-group">
+          <label for="activity">Activity Level</label>
+          <select id="activity" required>
+            <option value="1.2">Sedentary (Little or no exercise)</option>
+            <option value="1.375" selected>Lightly Active (1-3 days/week)</option>
+            <option value="1.55">Moderately Active (3-5 days/week)</option>
+            <option value="1.725">Very Active (6-7 days/week)</option>
+            <option value="1.9">Extra Active (Hard exercise & physical job)</option>
+          </select>
+        </div>
+
+        <!-- Goal -->
+        <div class="form-group">
+          <label for="goal">Fitness Goal</label>
+          <select id="goal" required>
+            <option value="maintain">Weight Maintenance</option>
+            <option value="lose">Lose Weight</option>
+            <option value="gain">Gain Weight</option>
+          </select>
+        </div>
+
+        <!-- Rate of Change (Loss/Gain) -->
+        <div class="form-group" id="rate-group">
+          <label for="rate">Weekly Rate</label>
+          <select id="rate">
+            <option value="0.25">0.25 kg (0.5 lb) per week</option>
+            <option value="0.5" selected>0.5 kg (1.0 lb) per week</option>
+            <option value="1.0">1.0 kg (2.0 lb) per week</option>
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group full-width">
+          <button type="submit" class="btn btn-primary btn-large">
+            <span>Calculate Target Macros</span> ✨
+          </button>
+        </div>
+      </form>
+
+      <!-- Calculator Results Area -->
+      <div id="results-area" class="results-area hidden">
+        <div class="divider"></div>
+        <div class="results-header">
+          <h3>Your Daily Target Macros & Safe Ranges</h3>
+          <p>Customize your macro splits with one click presets below:</p>
+
+          <!-- Macro Preset Buttons -->
+          <div class="preset-buttons">
+            <button class="preset-btn active" data-preset="balanced">⚖️ Balanced</button>
+            <button class="preset-btn" data-preset="low-fat">🥑 Low Fat</button>
+            <button class="preset-btn" data-preset="low-carbs">🌾 Low Carbs</button>
+            <button class="preset-btn" data-preset="high-carbs">🥔 High Carbs</button>
+            <button class="preset-btn" data-preset="high-protein">🍗 High Protein</button>
+          </div>
+        </div>
+
+        <!-- Macro Summary Cards Grid -->
+        <div class="macro-cards-grid">
+          <!-- Total Calories Card -->
+          <div class="macro-card calories-card">
+            <div class="macro-icon">🔥</div>
+            <div class="macro-label">Total Calories</div>
+            <div class="macro-value" id="val-calories">--</div>
+            <div class="macro-unit">kcal / day</div>
+            <div class="macro-range" id="range-calories">Target range: --</div>
+          </div>
+
+          <!-- Protein Card -->
+          <div class="macro-card protein-card">
+            <div class="macro-icon">🥩</div>
+            <div class="macro-label">Protein</div>
+            <div class="macro-value" id="val-protein">--</div>
+            <div class="macro-unit">grams / day</div>
+            <div class="macro-range" id="range-protein">Range: Min --g | Max --g</div>
+          </div>
+
+          <!-- Carbs Card -->
+          <div class="macro-card carbs-card">
+            <div class="macro-icon">🥖</div>
+            <div class="macro-label">Carbohydrates</div>
+            <div class="macro-value" id="val-carbs">--</div>
+            <div class="macro-unit">grams / day</div>
+            <div class="macro-range" id="range-carbs">Range: Min --g | Max --g</div>
+          </div>
+
+          <!-- Fat Card -->
+          <div class="macro-card fat-card">
+            <div class="macro-icon">🫒</div>
+            <div class="macro-label">Total Fat</div>
+            <div class="macro-value" id="val-fat">--</div>
+            <div class="macro-unit">grams / day</div>
+            <div class="macro-range" id="range-fat">Range: Min --g | Max --g</div>
+          </div>
+
+          <!-- Sugar Card -->
+          <div class="macro-card sugar-card">
+            <div class="macro-icon">🍯</div>
+            <div class="macro-label">Added Sugar Limit</div>
+            <div class="macro-value" id="val-sugar">--</div>
+            <div class="macro-unit">grams max / day</div>
+            <div class="macro-range" id="range-sugar">Safe Cap: Max --g</div>
+          </div>
+
+          <!-- Saturated Fat Card -->
+          <div class="macro-card sat-fat-card">
+            <div class="macro-icon">🧈</div>
+            <div class="macro-label">Saturated Fat Limit</div>
+            <div class="macro-value" id="val-sat-fat">--</div>
+            <div class="macro-unit">grams max / day</div>
+            <div class="macro-range" id="range-sat-fat">Safe Cap: Max --g</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Food Lookup Section -->
+    <section id="food-lookup-section" class="section-card">
+      <div class="section-header">
+        <h2>2. Food Micronutrient & Macronutrient Database</h2>
+        <p>Type any food item to view detailed macros (Serving Size, Protein, Carbs, Fat, Sugar, Saturated Fat) and key
+          micronutrients.</p>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="food-search-input"
+          placeholder="🔍 Search food (e.g., Chicken Breast, Oats, Salmon, Apple, Avocado)...">
+      </div>
+
+      <div id="food-results-container" class="food-results-grid">
+        <!-- Dynamic search results populated by JS -->
+      </div>
+
+      <!-- Pagination Controls -->
+      <div id="food-pagination-container" class="pagination-container">
+      </div>
+    </section>
+
+    <!-- AI Meal Plan Section -->
+    <section id="ai-planner-section" class="section-card highlight-card">
+      <div class="section-header">
+        <h2>3. Smart AI Meal Recommendation Engine</h2>
+        <p>Generate 3 balanced dishes (Breakfast, Lunch, Dinner) and optional Sweet/Dessert aligned with your calculated
+          target macros and 100% strictly free from your specified allergies or dislikes.</p>
+      </div>
+
+      <div class="ai-controls-grid">
+        <div class="form-group">
+          <label for="sweet-toggle">Include Sweet / Dessert?</label>
+          <select id="sweet-toggle">
+            <option value="yes" selected>Yes - Include Dessert Dish 🍰</option>
+            <option value="no">No - Main Meals Only 🥗</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="allergen-input">Allergies & Disliked Foods (Comma Separated)</label>
+          <input type="text" id="allergen-input" placeholder="e.g. Dairy, Nuts, Fish, Egg, Soy, Gluten...">
+        </div>
+
+        <div class="form-group full-width">
+          <button id="generate-ai-meals-btn" class="btn btn-accent btn-large">
+            <span>Generate AI Custom Meal Plan</span> 🤖
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Results Display -->
+      <div id="ai-meals-output" class="ai-meals-container hidden">
+        <div class="ai-summary-bar" id="ai-summary-bar">
+          <!-- Populated by JS -->
+        </div>
+        <div class="meals-grid" id="meals-grid">
+          <!-- Meal cards rendered by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Health & Sugar Guide Modal -->
+  <div id="guide-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📘 General Health, Sugar & Nutrition Guide</h3>
+        <button id="close-guide-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-badge">Ministry of Health Guidelines & Science-Backed Advice</div>
+
+        <h4>1. Reaching Your Fitness Goal Efficiently</h4>
+        <ul>
+          <li><strong>Energy Balance:</strong> To lose weight safely, aim for a gradual 0.25kg to 1kg weekly reduction.
+            For muscle gain, maintain a small progressive surplus paired with resistance training.</li>
+          <li><strong>Protein Priority:</strong> Consume 1.6g - 2.2g of protein per kg of body weight to preserve lean
+            muscle tissue and support satiety.</li>
+          <li><strong>Hydration:</strong> Drink at least 2.5 to 3.5 liters of water daily to support metabolic functions
+            and energy levels.</li>
+        </ul>
+
+        <h4>2. Managing Sugar & Saturated Fats</h4>
+        <ul>
+          <li><strong>Added Sugar Cap:</strong> Keep added sugars strictly under 10% (ideally under 5%) of your total
+            daily caloric intake (approx. 25g - 36g max per day).</li>
+          <li><strong>Saturated Fats:</strong> Limit saturated fat intake to under 10% of total daily calories to
+            maintain healthy LDL cholesterol and cardiovascular fitness.</li>
+          <li><strong>Whole Foods First:</strong> Replace refined sugars with natural fruits, berries, and complex
+            whole-grain carbohydrates rich in dietary fiber.</li>
+        </ul>
+
+        <h4>3. Understanding Your Macros</h4>
+        <div class="guide-grid">
+          <div class="guide-card">
+            <h5>🥩 Protein</h5>
+            <p>Essential for muscle repair, immune function, and enzymes. Yields 4 kcal per gram.</p>
+          </div>
+          <div class="guide-card">
+            <h5>🥖 Carbohydrates</h5>
+            <p>Primary energy source for brain and muscles. Fiber aids gut digestion. Yields 4 kcal per gram.</p>
+          </div>
+          <div class="guide-card">
+            <h5>🫒 Healthy Fats</h5>
+            <p>Vital for hormone synthesis and absorption of vitamins A, D, E, K. Yields 9 kcal per gram.</p>
+          </div>
+        </div>
+
+        <div class="guide-footer-note">
+          <p>💡 Source References: Official Health & Sugar Awareness Guidelines (MOH / USDA Nutritional Databases).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>© 2026 NutriFit Engine. Empowering your wellness journey with science and AI.</p>
+    </div>
+  </footer>
+
+  <script src="usdaData.js"></script>
+  <script src="foodData.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

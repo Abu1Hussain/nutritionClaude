@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriVision - Daily Nutrition Calculator & Meal Planner</title>
+  <meta name="description"
+    content="NutriVision helps adults estimate daily calorie and macronutrient targets, view a BMI reference gauge, generate an illustrative three-meal plan, and search a 7,000+ item food database.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="logo">
+        <div class="logo-icon">🥗</div>
+        <div class="logo-text">NutriVision</div>
+      </div>
+      <nav class="main-nav" aria-label="Main sections">
+        <button type="button" class="nav-btn" data-view="home">Home</button>
+        <button type="button" class="nav-btn active" data-view="calculator" aria-current="page">Calculator</button>
+        <button type="button" class="nav-btn" data-view="mealplan">Meal Plan</button>
+        <button type="button" class="nav-btn" data-view="targets">Targets</button>
+        <button type="button" class="nav-btn" data-view="foods">Foods</button>
+        <button type="button" class="nav-btn" data-view="rewards">Rewards</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container main-content">
+
+    <!-- ================= HOME VIEW ================= -->
+    <section id="view-home" class="app-view hidden" data-view-panel="home" tabindex="-1">
+      <div class="view-intro">
+        <h1>Today's activity</h1>
+        <p>Track today's steps, see the Fit Coins you've earned, and manage step-goal reminders. Information here
+          is stored on this device only.</p>
+      </div>
+
+      <div class="home-grid">
+        <div class="field-card">
+          <h2 class="field-card-title">Daily total steps</h2>
+
+          <div class="steps-log-row">
+            <div class="form-group steps-log-input">
+              <label for="steps-input">Steps logged today</label>
+              <input type="number" id="steps-input" min="0" max="200000" step="1" inputmode="numeric"
+                placeholder="e.g. 6200">
+            </div>
+            <button type="button" class="btn btn-primary" id="steps-save-btn">Save steps</button>
+          </div>
+
+          <div class="progress-bar-track" role="progressbar" id="home-steps-progressbar" aria-valuemin="0"
+            aria-valuemax="5000" aria-valuenow="0" aria-label="Progress toward today's 5,000-step target">
+            <div class="progress-bar-fill" id="home-steps-progress-bar"></div>
+          </div>
+          <p class="progress-readout"><span id="home-steps-value">0</span> / <span id="home-steps-target">5,000</span>
+            steps</p>
+          <p class="field-help" id="home-steps-remaining">5,000 steps remaining today</p>
+
+          <p class="health-connect-note">On a phone, steps can come from the Health app (iPhone) or Google Fit
+            (Android). Direct HealthKit / Google Fit sync requires installing NutriVision as a mobile app and is not
+            available in this browser preview — log steps manually above instead. External service — no
+            automatic account connection or data synchronization.</p>
+
+          <div class="divider"></div>
+
+          <h3 class="results-heading">Step-goal reminders</h3>
+          <label class="switch-toggle">
+            <input type="checkbox" id="reminder-toggle">
+            <span class="toggle-switch" aria-hidden="true"></span>
+            <span>Remind me about today's step target</span>
+          </label>
+          <p class="field-help">Uses your browser's notification permission. Reminders only fire while this page is
+            open in a tab — this prototype does not use background push notifications.</p>
+          <button type="button" class="btn btn-outline" id="reminder-test-btn">Send a test reminder</button>
+        </div>
+
+        <div class="field-card">
+          <h2 class="field-card-title">Fit Coins</h2>
+          <p class="field-help">You earn 1 Fit Coin for every 1,000 steps logged.</p>
+
+          <div class="coin-stats-grid">
+            <div class="coin-stat-card">
+              <span class="coin-stat-label">Earned today</span>
+              <span class="coin-stat-value" id="home-coins-today">0</span>
+            </div>
+            <div class="coin-stat-card coin-stat-card-total">
+              <span class="coin-stat-label">Lifetime balance</span>
+              <span class="coin-stat-value" id="home-coins-balance">0</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-outline btn-large" data-view-link="rewards">Spend coins in
+            Rewards</button>
+
+          <div class="divider"></div>
+
+          <h3 class="results-heading">Recent days</h3>
+          <div class="history-list" id="steps-history-list"></div>
+
+          <div class="divider"></div>
+          <button type="button" class="btn btn-ghost" id="reset-data-btn">Reset saved data on this device</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CALCULATOR VIEW ================= -->
+    <section id="view-calculator" class="app-view" data-view-panel="calculator" tabindex="-1">
+      <div class="view-intro">
+        <h1>Estimate your daily nutrition targets</h1>
+        <p>Answer a few questions to get an estimated daily calorie and macronutrient target. This tool provides
+          general wellness estimates, not medical advice.</p>
+      </div>
+
+      <div class="calculator-layout">
+        <!-- LEFT COLUMN: INPUTS -->
+        <div class="calc-column calc-inputs">
+          <form id="calc-form" novalidate>
+
+            <div class="field-card">
+              <h2 class="field-card-title">About you</h2>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="input-age">Age (years)</label>
+                  <input type="number" id="input-age" name="age" min="20" max="100" step="1" value="25"
+                    inputmode="numeric" aria-describedby="age-help age-error" required>
+                  <p class="field-help" id="age-help">Supported range: 20-100. This calculator is designed for
+                    adults.</p>
+                  <p class="field-error" id="age-error" role="alert"></p>
+                </div>
+
+                <fieldset class="form-group">
+                  <legend>Sex for calculation</legend>
+                  <p class="field-help" id="sex-help">Used by the resting-energy (Mifflin-St Jeor) equation selected
+                    below.</p>
+                  <div class="radio-pill-group" role="radiogroup" aria-describedby="sex-help">
+                    <label class="radio-pill">
+                      <input type="radio" name="sex" value="male" checked>
+                      <span>Male</span>
+                    </label>
+                    <label class="radio-pill">
+                      <input type="radio" name="sex" value="female">
+                      <span>Female</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="input-height">Height (cm)</label>
+                  <input type="number" id="input-height" name="height" min="120" max="230" step="0.1" value="175"
+                    inputmode="decimal" aria-describedby="height-help height-error" required>
+                  <p class="field-help" id="height-help">Supported range: 120-230 cm. Decimals allowed.</p>
+                  <p class="field-error" id="height-error" role="alert"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-weight">Weight (kg)</label>
+                  <input type="number" id="input-weight" name="weight" min="35" max="300" step="0.1" value="70"
+                    inputmode="decimal" aria-describedby="weight-help weight-error" required>
+                  <p class="field-help" id="weight-help">Supported range: 35-300 kg. Decimals allowed.</p>
+                  <p class="field-error" id="weight-error" role="alert"></p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-activity">Activity level</label>
+                <select id="input-activity" name="activity" aria-describedby="activity-help activity-error" required>
+                  <option value="1.2">Sedentary - little or no exercise</option>
+                  <option value="1.375" selected>Lightly active - exercise 1-3 days per week</option>
+                  <option value="1.55">Moderately active - exercise 3-5 days per week</option>
+                  <option value="1.725">Very active - exercise 6-7 days per week</option>
+                  <option value="1.9">Extra active - intense training or physical job</option>
+                </select>
+                <p class="field-help" id="activity-help">Consider movement at work and daily life, not only planned
+                  workouts.</p>
+                <p class="field-error" id="activity-error" role="alert"></p>
+              </div>
+            </div>
+
+            <div class="field-card">
+              <h2 class="field-card-title">Your goal</h2>
+
+              <div class="goal-cards" role="radiogroup" aria-label="Goal" aria-describedby="goal-error">
+                <label class="goal-card">
+                  <input type="radio" name="goal" value="lose">
+                  <span class="goal-icon" aria-hidden="true">&#8595;</span>
+                  <span class="goal-label">Lose fat</span>
+                </label>
+                <label class="goal-card">
+                  <input type="radio" name="goal" value="maintain" checked>
+                  <span class="goal-icon" aria-hidden="true">&#8594;</span>
+                  <span class="goal-label">Maintain weight</span>
+                </label>
+                <label class="goal-card">
+                  <input type="radio" name="goal" value="gain">
+                  <span class="goal-icon" aria-hidden="true">&#8593;</span>
+                  <span class="goal-label">Gain muscle</span>
+                </label>
+              </div>
+              <p class="field-error" id="goal-error" role="alert"></p>
+
+              <div id="rate-group" class="form-group rate-group hidden">
+                <span class="rate-group-label" id="rate-label">Weekly rate</span>
+                <div class="radio-pill-group" role="radiogroup" aria-labelledby="rate-label">
+                  <label class="radio-pill">
+                    <input type="radio" name="rate" value="0.25" checked>
+                    <span>0.25 kg/week</span>
+                  </label>
+                  <label class="radio-pill">
+                    <input type="radio" name="rate" value="0.5">
+                    <span>0.5 kg/week</span>
+                  </label>
+                  <label class="radio-pill radio-pill-aggressive">
+                    <input type="radio" name="rate" value="0.75">
+                    <span>0.75 kg/week <em>(aggressive)</em></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-card">
+              <div id="eligibility-wrap" class="eligibility-wrap hidden">
+                <label class="eligibility-check">
+                  <input type="checkbox" id="input-eligibility" aria-describedby="eligibility-error">
+                  <span>I'm 20 or older and I'm not pregnant or breastfeeding.</span>
+                </label>
+                <p class="field-error" id="eligibility-error" role="alert"></p>
+              </div>
+              <p class="privacy-note">Your inputs stay on this page. Nothing you enter here is sent to an external
+                server.</p>
+            </div>
+
+            <div class="form-error-banner hidden" id="form-error-banner" role="alert"></div>
+
+            <button type="submit" class="btn btn-primary btn-large" id="calculate-btn">Calculate Target</button>
+          </form>
+
+          <details class="explain-details">
+            <summary>How These Estimates Work</summary>
+            <div class="explain-body">
+              <h3>Resting energy (Mifflin-St Jeor equation)</h3>
+              <p>Resting energy is estimated with the Mifflin-St Jeor equation, a widely used formula based on
+                weight, height, age, and sex. It is a population-level estimate, not a measurement of your personal
+                metabolism.</p>
+
+              <h3>Activity multiplication</h3>
+              <p>Resting energy is multiplied by an activity factor (1.2 to 1.9) to approximate total daily energy
+                expenditure (TDEE), which includes movement, exercise, and daily activity.</p>
+
+              <h3>Weight-change approximation</h3>
+              <p>Weight change is approximated using 7,700 kcal per kilogram of body weight. This is a simplified
+                estimate; actual results vary by individual and are influenced by many factors beyond calorie
+                counting.</p>
+
+              <h3>Macronutrient percentages</h3>
+              <p>Protein, carbohydrate, and fat targets use a prototype split of 25% / 45% / 30% of total calories.
+                This is one reasonable distribution among many, not a universal prescription.</p>
+
+              <h3>Sugar and saturated-fat limits</h3>
+              <p>Added-sugar and saturated-fat figures are shown as upper limits (calculated at 10% of calories
+                each), not goals to reach. Total sugar shown for foods and meals includes naturally occurring sugars
+                and is not the same measurement as an added-sugar limit.</p>
+
+              <h3>Uncertainty of predictions</h3>
+              <p>Any weekly rate of weight change is an estimate. Individual results are not guaranteed and can be
+                affected by hydration, muscle mass, hormones, sleep, and other factors. A 0.75 kg/week target is an
+                aggressive rate and may be unsuitable for some people; review it with a qualified professional.</p>
+
+              <h3>BMI limitations</h3>
+              <p>BMI is a screening measure based on height and weight only. It does not directly measure body fat
+                and does not account for muscle mass, frame size, or other individual differences.</p>
+
+              <h3>Meal data limitations</h3>
+              <p>Meal nutrient values come from a historical USDA reference dataset. Where a nutrient is not
+                reported, it is shown as unavailable rather than assumed to be zero.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- RIGHT COLUMN: RESULTS -->
+        <div class="calc-column calc-results">
+          <div class="results-card" id="results-card">
+
+            <div id="calc-error-notice" class="notice-banner notice-error hidden" role="alert"></div>
+
+            <div class="empty-results" id="empty-results">
+              <p>Fill in the form and select <strong>Calculate Target</strong> to see your BMI gauge and daily
+                nutrition targets here.</p>
+            </div>
+
+            <div class="results-content hidden" id="results-content">
+
+              <div class="stale-banner hidden" id="stale-banner" role="status">
+                Inputs have changed. Select <strong>Calculate Target</strong> again to update your results.
+              </div>
+
+              <!-- BMI GAUGE -->
+              <div class="gauge-block">
+                <h2 class="results-heading">BMI reference gauge</h2>
+                <div class="gauge-wrap" id="gauge-wrap" aria-hidden="true"></div>
+                <div class="gauge-readout">
+                  <span class="gauge-bmi-value" id="gauge-bmi-value">--</span>
+                  <span class="gauge-bmi-status" id="gauge-bmi-status">--</span>
+                </div>
+                <p class="gauge-text-alt" id="gauge-text-alt">Calculate your target to see your BMI and status
+                  here.</p>
+                <p class="gauge-explainer">BMI is a screening estimate, not a diagnosis. It does not directly
+                  measure body fat or account for differences such as muscle mass. The four shaded bands on each
+                  side of the reference range are visual subdivisions used by this app, not four official clinical
+                  diagnoses.</p>
+                <p class="ref-weight-range" id="ref-weight-range"></p>
+              </div>
+
+              <div class="divider"></div>
+
+              <!-- SUMMARY STATS -->
+              <h2 class="results-heading">Energy summary</h2>
+              <dl class="stats-list" id="stats-list"></dl>
+
+              <div id="goal-notice" class="notice-banner hidden" role="status"></div>
+              <div id="aggressive-notice" class="notice-banner notice-warning hidden" role="alert"></div>
+
+              <div class="divider"></div>
+
+              <!-- NUTRIENT CARDS -->
+              <h2 class="results-heading">Daily nutrient targets</h2>
+              <div class="nutrient-cards-grid" id="nutrient-cards-grid"></div>
+
+              <button type="button" class="btn btn-outline btn-large share-btn" id="share-btn">Share My
+                Targets</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MEAL PLAN VIEW ================= -->
+    <section id="view-mealplan" class="app-view hidden" data-view-panel="mealplan" tabindex="-1">
+      <div class="view-intro">
+        <h1>Illustrative meal plan</h1>
+        <p>An example three-meal structure sized to your most recently calculated calorie target.</p>
+      </div>
+
+      <div id="mealplan-empty" class="empty-results">
+        <p>Calculate your target in the <strong>Calculator</strong> section first. The meal plan will use your most
+          recently calculated result.</p>
+      </div>
+
+      <div id="mealplan-content" class="hidden">
+        <div class="mealplan-banner">
+          <div class="mealplan-banner-target">
+            <span class="mealplan-banner-label">Daily calorie target</span>
+            <span class="mealplan-banner-value" id="mealplan-calorie-value">--</span>
+          </div>
+          <p class="mealplan-banner-note">Portions below adapt automatically to your latest calculation. Adjust
+            inputs and recalculate in the Calculator section to update this plan.</p>
+          <label class="dessert-toggle">
+            <input type="checkbox" id="dessert-toggle">
+            <span class="toggle-switch" aria-hidden="true"></span>
+            <span>Include optional dessert</span>
+          </label>
+        </div>
+
+        <div class="meal-cards-grid" id="meal-cards-grid"></div>
+
+        <div class="day-glance-card">
+          <h2 class="results-heading">Your day at a glance</h2>
+          <p class="day-glance-note">Meal totals below reflect <strong>total sugar</strong> naturally present in
+            foods. This is a different measurement from the <strong>added-sugar limit</strong> shown in the
+            Calculator section.</p>
+          <div class="day-glance-table" id="day-glance-table"></div>
+        </div>
+
+        <div class="calo-panel">
+          <h2 class="results-heading">Explore meals on Calo</h2>
+          <p>Browse Calo's official menu, open or download the Calo application, copy your NutriVision targets, and
+            manually enter appropriate targets into Calo where supported.</p>
+          <div class="calo-panel-actions">
+            <a class="btn btn-outline" id="calo-menu-link" href="https://calo.app/en/menu" target="_blank"
+              rel="noopener noreferrer">Open Calo menu</a>
+            <a class="btn btn-outline" id="calo-app-link" href="https://calo.go.link/?adj_t=1fubx4rk" target="_blank"
+              rel="noopener noreferrer">Open Calo app</a>
+            <button type="button" class="btn btn-outline" id="calo-copy-btn">Copy my targets</button>
+          </div>
+          <p class="calo-disclaimer">External service - no automatic account connection or data synchronization.
+            NutriVision is not affiliated with Calo. No personal or nutrition data is sent automatically.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TARGETS VIEW ================= -->
+    <section id="view-targets" class="app-view hidden" data-view-panel="targets" tabindex="-1">
+      <div class="view-intro">
+        <h1>Your targets</h1>
+        <p>A quick summary of your daily and weekly goals, combining nutrition and activity.</p>
+      </div>
+
+      <div id="targets-empty" class="empty-results">
+        <p>Calculate your target in the <strong>Calculator</strong> section first to see your weekly weight goal
+          and daily calorie target here.</p>
+      </div>
+
+      <div id="targets-content" class="hidden">
+        <div class="target-stat-grid">
+          <div class="target-stat-card">
+            <span class="target-stat-label">Daily step target</span>
+            <span class="target-stat-value" id="targets-steps-value">5,000 steps/day</span>
+            <span class="target-stat-note">A general activity goal used throughout NutriVision.</span>
+          </div>
+          <div class="target-stat-card">
+            <span class="target-stat-label">Weekly weight goal</span>
+            <span class="target-stat-value" id="targets-weekly-value">--</span>
+            <span class="target-stat-note">An estimate, not a guarantee. See the Calculator section for details.</span>
+          </div>
+          <div class="target-stat-card">
+            <span class="target-stat-label">Daily calorie target</span>
+            <span class="target-stat-value" id="targets-calories-value">--</span>
+            <span class="target-stat-note">From your most recent calculation.</span>
+          </div>
+        </div>
+        <p class="privacy-note">This information is calculated from your last successful calculation and stored on
+          this device only.</p>
+      </div>
+    </section>
+
+    <!-- ================= FOODS VIEW ================= -->
+    <section id="view-foods" class="app-view hidden" data-view-panel="foods" tabindex="-1">
+      <div class="view-intro">
+        <h1>Food database</h1>
+        <p>Search a historical USDA reference dataset (SR Legacy) of 7,793 foods. All values are shown <strong>per
+            100 g</strong>.</p>
+      </div>
+
+      <div class="foods-toolbar">
+        <div class="foods-search-wrap">
+          <label for="food-search-input" class="sr-only">Search foods</label>
+          <input type="search" id="food-search-input" placeholder="Search foods, e.g. chicken, rice, apple">
+        </div>
+        <div class="foods-category-wrap">
+          <label for="food-category-select" class="sr-only">Category</label>
+          <select id="food-category-select">
+            <option value="">All categories</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="foods-result-count" id="foods-result-count" role="status"></p>
+      <p class="foods-dash-note">A dash means the nutrient was not reported; it does not mean zero.</p>
+
+      <div id="foods-grid" class="foods-grid"></div>
+
+      <nav class="pagination-container" id="foods-pagination" aria-label="Food results pages"></nav>
+    </section>
+
+    <!-- ================= REWARDS VIEW ================= -->
+    <section id="view-rewards" class="app-view hidden" data-view-panel="rewards" tabindex="-1">
+      <div class="view-intro">
+        <h1>Rewards</h1>
+        <p>Spend the Fit Coins you earn from walking. 1 Fit Coin = 1,000 steps logged.</p>
+      </div>
+
+      <div class="rewards-balance-banner">
+        <span class="rewards-balance-label">Your balance</span>
+        <span class="rewards-balance-value" id="rewards-balance-value">0</span>
+        <span class="rewards-balance-unit">Fit Coins</span>
+      </div>
+      <p class="rewards-disclaimer">Demo rewards catalog — redemptions are recorded locally in this prototype
+        and do not send real gift cards, devices, or subscriptions.</p>
+
+      <div id="rewards-grid" class="rewards-grid"></div>
+
+      <div class="my-rewards-card">
+        <h2 class="results-heading">My redeemed rewards</h2>
+        <div class="my-rewards-list" id="my-rewards-list"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= SHARE DIALOG ================= -->
+  <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-dialog-title">
+    <form method="dialog" class="share-dialog-form">
+      <div class="share-dialog-header">
+        <h2 id="share-dialog-title">Share my targets</h2>
+        <button type="submit" class="dialog-close-btn" id="share-dialog-close-x" aria-label="Close dialog">
+          &times;</button>
+      </div>
+      <p class="share-dialog-desc">This preview contains only your nutrition targets. Your age, sex, height,
+        weight, and BMI are not included.</p>
+      <label for="share-preview-text" class="sr-only">Share text preview</label>
+      <textarea id="share-preview-text" class="share-preview-text" readonly rows="12"></textarea>
+      <p class="share-status" id="share-status" role="status"></p>
+      <div class="share-dialog-actions">
+        <button type="button" class="btn btn-primary" id="share-copy-btn">Copy Targets</button>
+        <button type="button" class="btn btn-outline hidden" id="share-native-btn">Share...</button>
+        <button type="submit" class="btn btn-ghost" id="share-close-btn">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>NutriVision provides general wellness estimates, not medical advice. Consult a qualified professional for
+        guidance specific to you.</p>
+      <p class="footer-sub">&copy; 2026 NutriVision. Values shown per 100 g unless noted. Historical USDA SR Legacy
+        reference dataset.</p>
+    </div>
+  </footer>
+
+  <div id="aria-live-region" class="sr-only" role="status" aria-live="polite"></div>
+
+  <script src="foodsData.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

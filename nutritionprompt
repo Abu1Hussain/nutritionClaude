@@ -1,0 +1,1076 @@
+Build a complete, polished, responsive nutrition web application named **Nourish**. This must be a functional application, not a marketing landing page or a static mockup.
+
+The application must help adult users:
+
+1. Calculate estimated daily calorie and nutrient targets.
+2. View their BMI position on a detailed weight-status gauge.
+3. Generate a three-meal daily plan with an optional dessert.
+4. Browse and search a database containing at least 500 foods.
+5. Share or copy their calorie and macronutrient targets.
+6. Open the official Calo menu or Calo application to find ready-made meals.
+
+Create a production-quality interface that works on desktop, tablet, and mobile.
+
+# 1. Product identity
+
+Application name: **Nourish**
+
+Suggested logo text: **nourish.**
+
+Visual tone:
+
+* Clean
+* Calm
+* Trustworthy
+* Modern
+* Health-oriented
+* Easy for nontechnical users to understand
+* Professional enough for a university software engineering project
+
+Use a green-and-white visual identity.
+
+Suggested colors:
+
+* Primary green: `#155B43`
+* Dark text: `#203B32`
+* Muted text: `#748079`
+* Page background: `#F5F7F5`
+* Light green: `#EAF4EB`
+* Border color: `#E3E9E4`
+* Warning background: pale yellow
+* Error background: pale red
+
+Use rounded cards, subtle borders, restrained shadows, comfortable spacing, and readable typography. Avoid excessive gradients, oversized marketing sections, or decorative elements that distract from the calculator.
+
+The first screen must immediately show the calculator.
+
+# 2. Main navigation
+
+Create a responsive top navigation bar with three sections:
+
+* Calculator
+* Meal Plan
+* Foods
+
+The active section must be visually highlighted.
+
+On mobile, keep all three options accessible without horizontal scrolling.
+
+Use a single-page application structure or equivalent smooth navigation. Updating sections must not reload the entire page.
+
+# 3. Calculator section
+
+The Calculator section is the main entry point.
+
+Use a two-column desktop layout:
+
+* Left column: user inputs
+* Right column: BMI gauge and calculated results
+
+Stack the columns vertically on smaller screens.
+
+## 3.1 Personal information form
+
+Collect these fields:
+
+### Age
+
+* Numeric input
+* Unit: years
+* Supported range: 20–100
+* Required
+
+This version is intended for adults aged 20 or older because the adult BMI reference categories are being used.
+
+### Sex for calculation
+
+Options:
+
+* Male
+* Female
+
+Explain through the label that this value is used by the selected resting-energy equation.
+
+### Height
+
+* Numeric input
+* Unit: centimeters
+* Supported range: 120–230 cm
+* Allow decimal values
+* Required
+
+### Weight
+
+* Numeric input
+* Unit: kilograms
+* Supported range: 35–300 kg
+* Allow decimal values
+* Required
+
+### Activity level
+
+Provide these options and numerical factors:
+
+| Activity option   | Description                       | Factor |
+| ----------------- | --------------------------------- | -----: |
+| Sedentary         | Little or no exercise             |    1.2 |
+| Lightly active    | Exercise 1–3 days per week        |  1.375 |
+| Moderately active | Exercise 3–5 days per week        |   1.55 |
+| Very active       | Exercise 6–7 days per week        |  1.725 |
+| Extra active      | Intense training or physical work |    1.9 |
+
+Add brief helper text reminding users to consider movement at work, not only gym sessions.
+
+## 3.2 Goal selection
+
+Create three selectable goal cards:
+
+* Lose weight
+* Maintain weight
+* Gain weight
+
+Use clear icons or arrows:
+
+* Downward arrow for losing
+* Horizontal arrow for maintaining
+* Upward arrow for gaining
+
+Only one goal can be selected at a time.
+
+If the user selects “Maintain weight,” hide the weekly-rate field.
+
+If the user selects “Lose weight” or “Gain weight,” display these weekly-rate options:
+
+* 0.25 kg/week
+* 0.5 kg/week
+* 1 kg/week
+
+The **1 kg/week option must be enabled and functional for both losing and gaining weight**. Do not disable or silently replace it.
+
+Label 1 kg/week as an aggressive target and show a clear caution after calculation. The caution must not stop the calculation unless the result is mathematically impossible, such as a non-positive calorie value.
+
+## 3.3 Eligibility confirmation
+
+Include a checkbox stating:
+
+“I’m 20 or older and I’m not pregnant or breastfeeding.”
+
+Require this checkbox before calculation.
+
+If it is unchecked, show a clear message explaining that this calculator is designed for adults and is not intended for pregnancy or breastfeeding.
+
+## 3.4 Calculate button
+
+Add a prominent primary button labeled:
+
+**Calculate Target**
+
+When clicked:
+
+1. Validate all inputs.
+2. Calculate BMI.
+3. Calculate resting energy.
+4. Calculate total daily energy expenditure.
+5. Apply the selected goal and weekly rate.
+6. Calculate daily nutrient targets.
+7. Update the gauge and results.
+8. Update the Meal Plan section using the new target.
+9. Keep the previous valid result visible if a new calculation fails.
+10. Show a specific error message near the form.
+
+Do not use generic messages such as “Something went wrong” when a more specific explanation is available.
+
+# 4. Nutrition calculations
+
+## 4.1 BMI
+
+Use:
+
+`BMI = weight in kilograms ÷ (height in metres × height in metres)`
+
+Display BMI with one decimal place.
+
+Also calculate the weight interval corresponding to BMI 18.5–24.9 for the user’s height:
+
+`minimum reference weight = 18.5 × height²`
+
+`maximum reference weight = 24.9 × height²`
+
+Use height in metres.
+
+Display the result as:
+
+“Reference weight range for your height: X–Y kg”
+
+Avoid presenting this range as a diagnosis or mandatory ideal weight.
+
+## 4.2 Resting energy
+
+Use the Mifflin–St Jeor equation.
+
+For males:
+
+`BMR = 10 × weight + 6.25 × height − 5 × age + 5`
+
+For females:
+
+`BMR = 10 × weight + 6.25 × height − 5 × age − 161`
+
+Where:
+
+* Weight is in kilograms
+* Height is in centimeters
+* Age is in years
+
+Display this result as “Resting energy.”
+
+## 4.3 Total daily energy expenditure
+
+Use:
+
+`TDEE = BMR × activity factor`
+
+Display this result as “Daily expenditure.”
+
+## 4.4 Weekly weight-change adjustment
+
+Use a simplified approximation of 7,700 kcal per kilogram.
+
+Calculate the daily adjustment as:
+
+`daily adjustment = 7,700 × weekly rate ÷ 7`
+
+Approximate adjustments:
+
+| Weekly rate  | Daily calorie adjustment |
+| ------------ | -----------------------: |
+| 0.25 kg/week |             275 kcal/day |
+| 0.5 kg/week  |             550 kcal/day |
+| 1 kg/week    |           1,100 kcal/day |
+
+For maintenance:
+
+`target calories = TDEE`
+
+For weight loss:
+
+`target calories = TDEE − daily adjustment`
+
+For weight gain:
+
+`target calories = TDEE + daily adjustment`
+
+Round displayed calories to the nearest whole number.
+
+The 1 kg/week option must produce a result for both loss and gain when the result remains mathematically positive.
+
+If a weight-loss calculation produces zero or negative calories, do not display a negative nutrition plan. Show this message:
+
+“This rate produces a non-positive calorie estimate. Choose a slower rate or speak with a qualified professional.”
+
+If the user selects weight loss while BMI is below 18.5, do not generate a weight-loss target. Show a respectful message advising professional guidance.
+
+Do not claim that a selected weekly change is guaranteed. Clearly describe it as an estimate.
+
+## 4.5 Macronutrient targets
+
+Use this prototype distribution:
+
+* Protein: 25% of calories
+* Carbohydrates: 45% of calories
+* Fat: 30% of calories
+
+Calculate grams using:
+
+`protein grams = calories × 0.25 ÷ 4`
+
+`carbohydrate grams = calories × 0.45 ÷ 4`
+
+`fat grams = calories × 0.30 ÷ 9`
+
+Display:
+
+* Calories in kcal
+* Protein in grams
+* Carbohydrates in grams
+* Fat in grams
+* Added-sugar limit in grams
+* Saturated-fat limit in grams
+
+For the prototype limits, use:
+
+`added-sugar limit = calories × 0.10 ÷ 4`
+
+`saturated-fat limit = calories × 0.10 ÷ 9`
+
+Clearly label sugar and saturated fat as **upper limits**, not goals the user should try to reach.
+
+Clearly distinguish:
+
+* Added sugar target or limit
+* Total sugar found in food and meal records
+
+Do not present them as the same measurement.
+
+# 5. BMI gauge
+
+Create a large semicircular gauge in the results card.
+
+The gauge represents BMI, not calorie intake.
+
+The central normal or reference region must be green.
+
+The left side must represent low BMI using four yellow shades.
+
+The right side must represent high BMI using four red shades.
+
+Use these bands:
+
+| Gauge area       |   BMI range | Color         |
+| ---------------- | ----------: | ------------- |
+| Very low level 4 |    Below 15 | Dark yellow   |
+| Low level 3      |     15–15.9 | Yellow        |
+| Low level 2      |     16–16.9 | Medium yellow |
+| Low level 1      |     17–18.4 | Light yellow  |
+| Reference range  |   18.5–24.9 | Green         |
+| High level 1     |     25–29.9 | Light red     |
+| High level 2     |     30–34.9 | Medium red    |
+| High level 3     |     35–39.9 | Red           |
+| High level 4     | 40 or above | Dark red      |
+
+Position a visible marker on the gauge according to the calculated BMI.
+
+Display the numeric BMI beneath or inside the gauge.
+
+Display a status label using respectful language:
+
+* Below reference
+* Healthy range
+* Above reference
+* Obesity — class 1
+* Obesity — class 2
+* Obesity — class 3
+
+Add this explanation:
+
+“BMI is a screening estimate, not a diagnosis. It does not directly measure body fat or account for differences such as muscle mass.”
+
+Also explain that the four low segments are visual subdivisions for the application and should not be presented as four official clinical diagnoses.
+
+Make the gauge accessible:
+
+* Include a text alternative
+* Include the calculated BMI and status in normal HTML
+* Do not rely on colors alone
+* Maintain sufficient contrast
+
+# 6. Calculated-results area
+
+The results area must include:
+
+* BMI
+* BMI status
+* Reference weight range
+* Resting energy
+* Daily expenditure
+* Target calories
+* Selected goal
+* Selected weekly rate, where applicable
+* Protein target
+* Carbohydrate target
+* Fat target
+* Added-sugar limit
+* Saturated-fat limit
+
+Use six nutrient cards for:
+
+1. Calories
+2. Protein
+3. Carbohydrates
+4. Fat
+5. Added sugar
+6. Saturated fat
+
+Each card must clearly show:
+
+* Nutrient name
+* Numeric value
+* Unit
+* Whether it is a target or upper limit
+
+If the goal is weight loss or gain, show a notice stating that actual weight change is not guaranteed and the target may need adjustment.
+
+If the selected rate is 1 kg/week, show a stronger message:
+
+“A 1 kg/week target is aggressive and may be unsuitable. Review this estimate with a qualified professional before following it.”
+
+This warning must appear without disabling the result.
+
+# 7. Sharing nutrition targets
+
+Add a button labeled:
+
+**Share My Targets**
+
+The sharing feature must share only the nutrition results. Do not include:
+
+* Age
+* Sex
+* Height
+* Weight
+* BMI
+* Pregnancy status
+* Any other private input
+
+The share text should contain:
+
+* Daily calories
+* Protein
+* Carbohydrates
+* Fat
+* Added-sugar limit
+* Saturated-fat limit
+* A short statement that these are general wellness estimates
+* A link to the Calo menu
+
+Example format:
+
+“My Nourish daily nutrition targets
+
+Calories: 2,300 kcal
+Protein: 144 g
+Carbohydrates: 259 g
+Fat: 77 g
+Added sugar: under 58 g
+Saturated fat: under 26 g
+
+General wellness estimates, not medical advice.
+
+Calo menu: https://calo.app/en/menu”
+
+When the button is clicked, open a dialog showing exactly what will be shared.
+
+The dialog must include:
+
+* Read-only text preview
+* Copy Targets button
+* Native Share button where the browser supports the Web Share API
+* Close button
+* Status message after copying or sharing
+
+If native sharing is unsupported, keep the Copy Targets action available.
+
+If clipboard access fails, select the text and tell the user to copy it manually.
+
+If the user edits calculator inputs after calculating, inform them that they must calculate again before the displayed and shared targets update.
+
+# 8. Meal Plan section
+
+The Meal Plan section must use the most recently calculated daily target.
+
+At the top, display:
+
+* Daily calorie target
+* Short explanation that portions adapt to the latest calculation
+* Optional dessert switch
+
+Default structure:
+
+* Breakfast
+* Lunch
+* Dinner
+
+If dessert is enabled:
+
+* Breakfast
+* Lunch
+* Dinner
+* Dessert
+
+## 8.1 Meal distribution
+
+Without dessert, use:
+
+* Breakfast: 30%
+* Lunch: 38%
+* Dinner: 32%
+
+With dessert enabled, use:
+
+* Breakfast: 25%
+* Lunch: 35%
+* Dinner: 30%
+* Dessert: 10%
+
+The percentages must total 100%.
+
+## 8.2 Meal-card consistency
+
+Breakfast, lunch, and dinner must use the exact same visual card structure.
+
+This requirement is essential.
+
+The lunch card must not contain a unique image, different spacing, different vertical alignment, or a separate layout that makes it taller than breakfast and dinner.
+
+Every main meal card must have:
+
+* Meal type
+* Percentage of the day
+* Meal name
+* Total calories
+* Ingredient list
+* Portion in grams for each ingredient
+* Protein
+* Carbohydrates
+* Fat
+* Total sugar
+* Saturated fat
+
+The cards should align evenly in a three-column desktop grid.
+
+On mobile, stack the cards vertically.
+
+If dessert is enabled, display its card using the same design language.
+
+## 8.3 Example meals
+
+Use realistic example meals such as:
+
+Breakfast: Berry and almond oat bowl
+
+* Plain skim yogurt
+* Oats
+* Blueberries
+* Almonds
+
+Lunch: Chicken and brown-rice bowl
+
+* Oven-roasted chicken
+* Cooked brown rice
+* Broccoli
+* Almonds or another suitable healthy-fat ingredient
+
+Dinner: Salmon and bulgur plate
+
+* Cooked salmon
+* Cooked bulgur
+* Broccoli
+* Almonds or another suitable healthy-fat ingredient
+
+Dessert: Strawberry chocolate yogurt
+
+* Plain skim yogurt
+* Strawberries
+* Dark chocolate
+
+Ingredient quantities must change according to the user’s calorie target and the meal’s calorie allocation.
+
+## 8.4 Nutrient calculation for meals
+
+Use verified nutrient values per 100 g from the chosen food dataset.
+
+For each ingredient:
+
+`ingredient nutrient = nutrient per 100 g × ingredient grams ÷ 100`
+
+For each meal:
+
+`meal nutrient = sum of nutrients from all ingredients`
+
+Calculate:
+
+* Calories
+* Protein
+* Carbohydrates
+* Fat
+* Total sugar
+* Saturated fat
+
+Meal totals should be close to their allocated calorie targets.
+
+Do not invent a value when the dataset does not provide it.
+
+Display “Not available” or a dash for missing values.
+
+Do not treat a missing value as zero.
+
+At the bottom, add a “Your day at a glance” summary comparing actual meal totals with:
+
+* Daily calorie target
+* Protein target
+* Carbohydrate target
+* Fat target
+* Sugar information
+* Saturated-fat limit
+
+Clarify that meal sugar represents total sugar while the calculator displays an added-sugar limit.
+
+# 9. Calo integration area
+
+Inside the Meal Plan section, add a panel titled:
+
+**Explore meals on Calo**
+
+Explain that users can:
+
+* Browse Calo’s official menu
+* Open or download the Calo application
+* Copy their Nourish targets
+* Manually enter appropriate targets into Calo where supported
+
+Provide these official links:
+
+* Calo menu: `https://calo.app/en/menu`
+* Calo application link: `https://calo.go.link/?adj_t=1fubx4rk`
+
+Open these links in a new tab or the relevant mobile application.
+
+Clearly state:
+
+“External service — no automatic account connection or data synchronization.”
+
+Do not claim that Nourish is affiliated with Calo.
+
+Do not automatically send personal or nutrition data to Calo.
+
+Do not claim that macros have been synchronized.
+
+# 10. Foods section
+
+Create a searchable food catalog.
+
+The catalog must contain at least 500 food records. Prefer several thousand records where practical.
+
+Use a documented nutrition source, such as a USDA-derived dataset.
+
+Each food entry should include:
+
+* Unique ID
+* Food name
+* Category
+* Calories per 100 g
+* Protein per 100 g
+* Carbohydrates per 100 g
+* Fat per 100 g
+* Total sugar per 100 g, when available
+* Saturated fat per 100 g, when available
+
+Show the measurement basis clearly:
+
+**Values per 100 g**
+
+Do not describe historical data as live data.
+
+If using a legacy USDA dataset, identify it as a historical reference dataset.
+
+## 10.1 Search
+
+Add a prominent search bar with placeholder text such as:
+
+“Search foods, e.g. chicken, rice, apple”
+
+Search must:
+
+* Be case-insensitive
+* Update while the user types
+* Support multiple words
+* Match food names
+* Return the number of matching records
+* Display an informative empty state if no foods match
+
+## 10.2 Category filter
+
+Add an “All categories” option and dynamically include all available categories from the data.
+
+Search and category filtering must work together.
+
+## 10.3 Pagination
+
+Display approximately 18 foods per page.
+
+Include:
+
+* Previous button
+* Next button
+* Current page
+* Total number of pages
+
+Disable Previous on the first page.
+
+Disable Next on the final page.
+
+Reset to page one when search or category changes.
+
+## 10.4 Food cards
+
+Each food card must display:
+
+* Food name
+* Food category
+* Calories
+* Protein
+* Carbohydrates
+* Fat
+* Total sugar
+* Saturated fat
+
+Use a dash when a nutrient is unavailable.
+
+Explain:
+
+“A dash means the nutrient was not reported; it does not mean zero.”
+
+# 11. Validation and error handling
+
+Use clear inline validation.
+
+Examples:
+
+* “Please enter an age between 20 and 100.”
+* “Please enter a valid height between 120 and 230 cm.”
+* “Please enter a valid weight between 35 and 300 kg.”
+* “Please select an activity level.”
+* “Please confirm that the adult calculator applies to you.”
+* “Weight-loss targets are unavailable below the adult BMI reference range.”
+* “This rate produces a non-positive calorie estimate.”
+
+Preserve the last valid calculation when invalid input is submitted.
+
+Never show:
+
+* `NaN`
+* `Infinity`
+* Negative calories
+* Blank units
+* Broken meal cards
+* Undefined nutrient values
+
+# 12. Responsive behavior
+
+Desktop:
+
+* Calculator inputs and results appear side by side.
+* Meal cards appear in three equal columns.
+* Food results appear in three columns.
+* Nutrient cards appear in six columns where space permits.
+
+Tablet:
+
+* Adjust spacing and card widths.
+* Nutrient cards may use three columns.
+* Preserve readable form controls.
+
+Mobile:
+
+* Stack calculator and results.
+* Stack meal cards.
+* Use one food column when needed.
+* Use two nutrient columns where practical.
+* Keep navigation usable.
+* Use touch targets of at least approximately 44 px.
+* Avoid horizontal scrolling.
+* Ensure dialogs fit within the viewport.
+
+# 13. Accessibility
+
+Implement:
+
+* Semantic headings
+* Proper form labels
+* Keyboard-accessible controls
+* Visible focus indicators
+* Sufficient color contrast
+* Accessible radio groups
+* Accessible dialog behavior
+* Escape-key dialog closing
+* Status messages using appropriate live regions
+* Text alternatives for the BMI gauge
+* Error messages connected to relevant inputs
+* No meaning communicated using color alone
+* Support for browser text enlargement
+* Respect for reduced-motion preferences
+
+# 14. Privacy
+
+All calculator data should remain in the browser for this prototype.
+
+Do not transmit personal measurements to external services.
+
+The share feature must exclude personal measurements.
+
+Clearly state:
+
+“Your inputs stay on this page.”
+
+If local storage is added, use it only with clear user expectations and provide a way to clear saved values.
+
+# 15. Important health-language rules
+
+Use neutral, respectful wording.
+
+Do not:
+
+* Diagnose users
+* Guarantee weight loss or gain
+* Claim BMI measures body fat
+* Call the reference range a perfect or mandatory weight
+* Present sugar limits as required intake
+* Describe automatically generated meals as medically prescribed
+* Claim that 1 kg/week is appropriate for everyone
+* Claim automatic Calo synchronization
+
+Use language such as:
+
+* Estimate
+* Reference range
+* General wellness
+* Screening measure
+* Upper limit
+* Illustrative plan
+* Consult a qualified professional when needed
+
+# 16. Required explanatory notes
+
+Include a collapsible section titled:
+
+**How These Estimates Work**
+
+Explain:
+
+* Mifflin–St Jeor equation
+* Activity multiplication
+* Simplified 7,700 kcal/kg approximation
+* Macronutrient percentages
+* Sugar and saturated-fat limits
+* Difference between total sugar and added sugar
+* Uncertainty of weight-change predictions
+* Extra caution for 1 kg/week
+* BMI limitations
+* Meal data limitations
+
+Keep this explanation understandable to ordinary users.
+
+# 17. State management
+
+Maintain one current calculated target object containing:
+
+* Age
+* Sex
+* Height
+* Weight
+* Activity factor
+* Goal
+* Weekly rate
+* BMI
+* BMR
+* TDEE
+* Daily target calories
+* Protein target
+* Carbohydrate target
+* Fat target
+* Added-sugar limit
+* Saturated-fat limit
+
+The Meal Plan and Share features must use the most recently successfully calculated target.
+
+If inputs change without recalculation:
+
+* Do not silently change the current results.
+* Show a message telling the user to calculate again.
+
+# 18. Suggested data structures
+
+Nutrition target object:
+
+```javascript
+{
+  age: 25,
+  sex: "male",
+  heightCm: 175,
+  weightKg: 70,
+  activityFactor: 1.55,
+  goal: "maintain",
+  weeklyRateKg: 0,
+  bmi: 22.9,
+  bmr: 1674,
+  tdee: 2594,
+  calories: 2594,
+  proteinGrams: 162,
+  carbohydrateGrams: 292,
+  fatGrams: 86,
+  addedSugarLimitGrams: 65,
+  saturatedFatLimitGrams: 29
+}
+```
+
+Food object:
+
+```javascript
+{
+  id: 20037,
+  name: "Rice, brown, long-grain, cooked",
+  category: "Cereal Grains and Pasta",
+  nutrientsPer100g: {
+    calories: 111,
+    protein: 2.58,
+    carbohydrates: 22.96,
+    fat: 0.9,
+    totalSugar: 0.35,
+    saturatedFat: 0.18
+  }
+}
+```
+
+Meal object:
+
+```javascript
+{
+  type: "lunch",
+  name: "Chicken and brown-rice bowl",
+  dailyPercentage: 0.38,
+  ingredients: [
+    {
+      foodId: 7933,
+      name: "Oven-roasted chicken",
+      grams: 180
+    },
+    {
+      foodId: 20037,
+      name: "Cooked brown rice",
+      grams: 200
+    }
+  ],
+  totals: {
+    calories: 760,
+    protein: 48,
+    carbohydrates: 82,
+    fat: 21,
+    totalSugar: 5,
+    saturatedFat: 4
+  }
+}
+```
+
+Preserve missing nutrients as `null`, not zero.
+
+# 19. Required interactions
+
+The following interactions must work:
+
+1. Selecting maintain hides the weekly-rate control.
+2. Selecting lose or gain shows the weekly-rate control.
+3. Selecting 1 kg/week calculates a target.
+4. Selecting 1 kg/week displays an aggressive-target caution.
+5. Calculate Target updates BMI, energy, nutrients, meals, and sharing text.
+6. Meal Plan uses the latest valid target.
+7. Dessert changes meal percentages and regenerates portion sizes.
+8. Breakfast, lunch, and dinner remain visually consistent.
+9. Share opens a preview dialog.
+10. Copy Targets copies only nutrition targets.
+11. Native Share works where supported.
+12. Calo menu opens the official menu page.
+13. Calo app link opens the official app/download route.
+14. Food search filters results immediately.
+15. Category filtering works with search.
+16. Pagination stays within valid bounds.
+17. Navigation changes sections without a full page reload.
+18. Invalid calculations preserve the last valid result.
+
+# 20. Acceptance tests
+
+The finished application must pass these checks:
+
+## Calculator tests
+
+* A 25-year-old male, 175 cm, 70 kg, moderately active, maintaining weight should produce approximately:
+
+  * BMI: 22.9
+  * BMR: 1,674 kcal
+  * TDEE: 2,594 kcal
+  * Target: 2,594 kcal
+
+* Macronutrient calories should approximately equal total calories:
+
+  * Protein grams × 4
+  * Plus carbohydrate grams × 4
+  * Plus fat grams × 9
+  * Approximately equals target calories
+
+* 0.25, 0.5, and 1 kg/week must work for both losing and gaining weight when the result is positive.
+
+* The 1 kg/week choice must not be blocked merely because it is aggressive.
+
+* A non-positive calorie result must produce an error instead of a negative plan.
+
+* Weight loss below BMI 18.5 must produce an appropriate message.
+
+## Meal tests
+
+* Meal percentages equal 100%.
+* Plans with dessert contain four cards.
+* Plans without dessert contain three cards.
+* Meal calorie totals are reasonably close to the daily calorie target.
+* Breakfast, lunch, and dinner have identical layout structures.
+* Lunch contains no unique image or spacing that makes it different from the other main meals.
+* Missing nutrients are displayed as unavailable rather than zero.
+
+## Food tests
+
+* Dataset contains at least 500 unique food records.
+* Searching “apple” returns matching records.
+* Searching “chicken” returns matching records.
+* Multiple-word search functions correctly.
+* Category and search filters work simultaneously.
+* Food values are labeled per 100 g.
+* Missing nutrients display a dash.
+
+## Sharing tests
+
+* Shared text includes calories and macros.
+* Shared text excludes age, sex, height, weight, and BMI.
+* Copy action works.
+* Unsupported native sharing falls back gracefully.
+
+## Responsive tests
+
+Test at approximately:
+
+* 1440 px desktop
+* 1024 px tablet
+* 390 px mobile
+
+There must be no unintended horizontal scrolling or clipped controls.
+
+# 21. Final delivery requirements
+
+Deliver:
+
+* Complete source code
+* All required local assets
+* Food data or a documented data-loading method
+* Working calculator
+* Working BMI gauge
+* Working meal planner
+* Working optional dessert control
+* Working food search, categories, and pagination
+* Working sharing dialog
+* Working Calo links
+* Responsive layouts
+* Accessible controls
+* Clear error and warning states
+* A deployment-ready build
+
+Before delivery:
+
+* Run syntax and build checks.
+* Test all three navigation sections.
+* Test every weekly-rate option.
+* Test loss, maintenance, and gain.
+* Test the meal plan with dessert enabled and disabled.
+* Confirm lunch matches breakfast and dinner.
+* Verify that share text excludes personal measurements.
+* Confirm that food search and pagination work.
+* Confirm that no calculation displays `NaN`, `Infinity`, or negative calories.
+* Remove placeholder content and unfinished controls.
+
+The final result must feel like a usable nutrition dashboard that a student team can demonstrate, evaluate, and extend.
