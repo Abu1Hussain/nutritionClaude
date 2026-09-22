@@ -106,7 +106,10 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(home: CookingScreen(box: recipeBoxes.first)),
+      MaterialApp(
+        theme: buildLightTheme(),
+        home: CookingScreen(box: recipeBoxes.first),
+      ),
     );
     expect(
       tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
