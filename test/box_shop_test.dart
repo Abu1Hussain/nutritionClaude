@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nutrition_app/screens/box_shop_screen.dart';
+import 'package:nutrition_app/services/app_state.dart';
 import 'package:nutrition_app/services/box_store.dart';
 import 'package:nutrition_app/theme.dart';
 
@@ -17,8 +18,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final store = BoxStore(await SharedPreferences.getInstance());
     await tester.pumpWidget(
-      ChangeNotifierProvider.value(
-        value: store,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: store),
+          ChangeNotifierProvider(create: (_) => AppState()),
+        ],
         child: MaterialApp(
           theme: buildLightTheme(),
           home: const Scaffold(body: BoxShopScreen()),
@@ -45,8 +49,11 @@ void main() {
     final store = BoxStore(await SharedPreferences.getInstance());
     await store.setQuantity('machboos', 1);
     await tester.pumpWidget(
-      ChangeNotifierProvider.value(
-        value: store,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: store),
+          ChangeNotifierProvider(create: (_) => AppState()),
+        ],
         child: MaterialApp(
           theme: buildLightTheme(),
           home: const CheckoutScreen(),

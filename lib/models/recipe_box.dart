@@ -20,7 +20,7 @@ class RecipeBox {
     this.allergens = const [],
   });
   int get calories => protein * 4 + carbs * 4 + fat * 9;
-  static const servings = 2;
+  static const servings = 1;
 }
 
 const recipeBoxes = <RecipeBox>[
@@ -32,7 +32,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Breakfast',
     photo: -1,
     minutes: 10,
-    priceFils: 3900,
+    priceFils: 1950,
     protein: 23,
     carbs: 58,
     fat: 12,
@@ -59,7 +59,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Chicken',
     photo: 0,
     minutes: 45,
-    priceFils: 6900,
+    priceFils: 3450,
     protein: 42,
     carbs: 76,
     fat: 18,
@@ -75,7 +75,7 @@ const recipeBoxes = <RecipeBox>[
       'Rinse the rice. Chop the vegetables.',
       'Sauté onion with the supplied oil, then add chicken, tomato, spices and dried lime.',
       'Add water and simmer until the chicken is cooked through.',
-      'Add rice and cook covered until tender. Check chicken reaches 74°C in the thickest part. Divide into two servings.',
+      'Add rice and cook covered until tender. Check chicken reaches 74°C in the thickest part.',
     ],
   ),
   RecipeBox(
@@ -86,7 +86,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Chicken',
     photo: 1,
     minutes: 55,
-    priceFils: 7200,
+    priceFils: 3600,
     protein: 39,
     carbs: 81,
     fat: 20,
@@ -113,7 +113,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Meat',
     photo: 2,
     minutes: 70,
-    priceFils: 8900,
+    priceFils: 4450,
     protein: 43,
     carbs: 72,
     fat: 28,
@@ -141,7 +141,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Chicken',
     photo: 3,
     minutes: 30,
-    priceFils: 6400,
+    priceFils: 3200,
     protein: 45,
     carbs: 54,
     fat: 19,
@@ -169,7 +169,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Plant-based',
     photo: 4,
     minutes: 40,
-    priceFils: 4900,
+    priceFils: 2450,
     protein: 19,
     carbs: 84,
     fat: 14,
@@ -196,7 +196,7 @@ const recipeBoxes = <RecipeBox>[
     category: 'Plant-based',
     photo: 5,
     minutes: 30,
-    priceFils: 5200,
+    priceFils: 2600,
     protein: 22,
     carbs: 66,
     fat: 21,

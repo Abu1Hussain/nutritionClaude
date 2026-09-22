@@ -19,6 +19,8 @@ String dateKey(DateTime d) =>
 
 String todayKey() => dateKey(DateTime.now());
 
+enum AppLanguage { en, ar }
+
 /// Central, persisted app state. Everything is stored locally on-device via
 /// SharedPreferences -- nothing here is sent to a server.
 class AppState extends ChangeNotifier {
@@ -28,6 +30,7 @@ class AppState extends ChangeNotifier {
   List<Redemption> redemptions = [];
   bool remindersEnabled = false;
   ThemeMode themeMode = ThemeMode.light;
+  AppLanguage language = AppLanguage.ar;
 
   /// User-edited meal calorie split (type -> fraction of the day), or null
   /// to use the built-in defaults. Keyed by the meal types for the current
@@ -67,6 +70,7 @@ class AppState extends ChangeNotifier {
         dessertEnabled = data['dessertEnabled'] as bool? ?? false;
         remindersEnabled = data['remindersEnabled'] as bool? ?? false;
         themeMode = (data['themeMode'] as String?) == 'dark' ? ThemeMode.dark : ThemeMode.light;
+        language = (data['language'] as String?) == 'en' ? AppLanguage.en : AppLanguage.ar;
 
         final overrides = data['mealPercentOverrides'] as Map<String, dynamic>?;
         if (overrides != null) {
@@ -127,6 +131,7 @@ class AppState extends ChangeNotifier {
         'dessertEnabled': dessertEnabled,
         'remindersEnabled': remindersEnabled,
         'themeMode': themeMode == ThemeMode.light ? 'light' : 'dark',
+        'language': language == AppLanguage.en ? 'en' : 'ar',
         'mealPercentOverrides': mealPercentOverrides,
         'selectedRecipeKey': selectedRecipeKey,
         'mealChoiceHistory': mealChoiceHistory,
@@ -407,6 +412,16 @@ class AppState extends ChangeNotifier {
 
   void toggleThemeMode() {
     setThemeMode(themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+  }
+
+  void setLanguage(AppLanguage value) {
+    language = value;
+    _persist();
+    notifyListeners();
+  }
+
+  void toggleLanguage() {
+    setLanguage(language == AppLanguage.ar ? AppLanguage.en : AppLanguage.ar);
   }
 
   // ==================================================================

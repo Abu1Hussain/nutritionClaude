@@ -64,7 +64,7 @@ void main() {
     });
     await tester.pump();
 
-    await tester.tap(find.byTooltip('Nutrition tools'));
+    await tester.tap(find.widgetWithIcon(IconButton, Icons.monitor_heart_outlined));
     await tester.pumpAndSettle();
 
     final appState = Provider.of<AppState>(find.byType(CalculatorScreen).evaluate().first, listen: false);

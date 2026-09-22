@@ -10,13 +10,13 @@ void main() {
     final store = BoxStore(prefs);
     expect(store.total, 0);
     await store.setQuantity('machboos', 2);
-    expect(store.subtotal, 13800);
-    expect(store.total, 14800);
-    await store.setQuantity('machboos', 3);
+    expect(store.subtotal, 6900);
+    expect(store.total, 7900);
+    await store.setQuantity('machboos', 6);
     expect(store.delivery, 0);
     await store.toggleFavorite('machboos');
     final restored = BoxStore(prefs);
-    expect(restored.count, 3);
+    expect(restored.count, 6);
     expect(restored.isFavorite('machboos'), isTrue);
     await store.setQuantity('machboos', 0);
     expect(store.total, 0);
@@ -29,7 +29,7 @@ void main() {
     expect(store.count, 0);
     final restored = BoxStore(prefs);
     expect(restored.orders.single['id'], id);
-    expect(restored.orders.single['total'], 10800);
+    expect(restored.orders.single['total'], 5900);
     expect(restored.orders.single['items'], {'mujaddara': 2});
     await expectLater(store.placeDemoOrder('Manama', 'Tomorrow'), throwsStateError);
   });

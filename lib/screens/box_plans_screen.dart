@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/strings.dart';
 import '../models/box_plan.dart';
 import '../models/recipe_box.dart';
 import '../services/box_store.dart';
@@ -57,14 +58,14 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'على قد يومك، وعلى ذوقك.',
-                style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
+              Text(
+                context.tr('plans.headline'),
+                style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'ابدأ بوجبة أو رتّب أسبوعك. كل بوكس يحتوي مقادير تكفي شخصين، والوصفات تختارها أنت.',
-                style: TextStyle(fontSize: 16, height: 1.7),
+              Text(
+                context.tr('plans.subtitle'),
+                style: const TextStyle(fontSize: 16, height: 1.7),
               ),
               const SizedBox(height: 24),
               LayoutBuilder(
@@ -128,8 +129,10 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
                                       const SizedBox(height: 14),
                                       Text(
                                         plan.discountPercent == 0
-                                            ? 'بدون التزام'
-                                            : 'خصم تجريبي ${plan.discountPercent}٪',
+                                            ? context.tr('plans.noCommitment')
+                                            : context
+                                                  .tr('plans.sampleDiscount')
+                                                  .replaceAll('{pct}', '${plan.discountPercent}'),
                                         style: TextStyle(
                                           color: selected == plan
                                               ? const Color(0xFFEBC397)
@@ -149,7 +152,7 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
               ),
               const SizedBox(height: 28),
               Text(
-                'اختَر وصفات ${selected.title}',
+                context.tr('plans.chooseRecipesFor').replaceAll('{plan}', selected.title),
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -158,15 +161,13 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
               const SizedBox(height: 8),
               Text(
                 selected == BoxPlan.monthly
-                    ? '٥ بوكسات كل أسبوع لمدة ٤ أسابيع. تتكرر اختياراتك أسبوعيًا، بإجمالي ٢٠ بوكس و٤ توصيلات.'
-                    : '${selected.boxes} بوكس • ${selected.boxes * 2} حصة • توصيل واحد',
+                    ? context.tr('plans.monthlySummary')
+                    : context.tr('plans.summary').replaceAll('{boxes}', '${selected.boxes}'),
               ),
               if (selected.isSubscription)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: Text(
-                    'الباقة الأسبوعية والشهرية تغطي وجبة واحدة يوميًا، ٥ أيام بالأسبوع. لا يوجد تجديد أو خصم تلقائي في النسخة التجريبية.',
-                  ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(context.tr('plans.subscriptionNote')),
                 ),
               const SizedBox(height: 20),
               for (var i = 0; i < meals.length; i++)
@@ -178,8 +179,12 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
                     isExpanded: true,
                     decoration: InputDecoration(
                       labelText: selected == BoxPlan.day
-                          ? ['الفطور', 'الغداء', 'العشاء'][i]
-                          : 'الوجبة ${i + 1}',
+                          ? [
+                              context.tr('plans.breakfast'),
+                              context.tr('plans.lunch'),
+                              context.tr('plans.dinner'),
+                            ][i]
+                          : context.tr('plans.mealLabel').replaceAll('{n}', '${i + 1}'),
                     ),
                     items: [
                       for (final box in recipeBoxes)
@@ -203,22 +208,20 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
                   padding: const EdgeInsets.all(22),
                   child: Column(
                     children: [
-                      _line('المقادير والوصفات', money(subtotal)),
+                      _line(context.tr('plans.lineIngredients'), money(subtotal)),
                       if (discount > 0)
                         _line(
-                          'خصم الباقة ${selected.discountPercent}٪',
+                          context.tr('plans.discountPct').replaceAll('{pct}', '${selected.discountPercent}'),
                           '− ${money(discount)}',
                         ),
                       _line(
-                        'التوصيل (${selected.deliveries})',
+                        context.tr('plans.deliveryCount').replaceAll('{n}', '${selected.deliveries}'),
                         money(delivery),
                       ),
                       const Divider(),
-                      _line('إجمالي الباقة', money(quote.total)),
+                      _line(context.tr('plans.lineTotal'), money(quote.total)),
                       const SizedBox(height: 12),
-                      const Text(
-                        'أسعار تجريبية. طقم البداية مشمول بلا تكلفة إضافية عند اختياره. لا يتم تحصيل مبالغ.',
-                      ),
+                      Text(context.tr('plans.pricesNote')),
                     ],
                   ),
                 ),
@@ -235,18 +238,16 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
                             final replace = await showDialog<bool>(
                               context: context,
                               builder: (c) => AlertDialog(
-                                title: const Text('استبدال محتويات السلة؟'),
-                                content: const Text(
-                                  'ستحل وصفات الباقة الجديدة محل الوجبات الموجودة في سلتك.',
-                                ),
+                                title: Text(context.tr('plans.replaceTitle')),
+                                content: Text(context.tr('plans.replaceBody')),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(c, false),
-                                    child: const Text('رجوع'),
+                                    child: Text(context.tr('plans.back')),
                                   ),
                                   FilledButton(
                                     onPressed: () => Navigator.pop(c, true),
-                                    child: const Text('استبدال'),
+                                    child: Text(context.tr('plans.replace')),
                                   ),
                                 ],
                               ),
@@ -263,7 +264,7 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
                           if (saved) widget.onBasket();
                         },
                   icon: const Icon(Icons.shopping_bag_outlined),
-                  label: Text(saving ? 'جارٍ الحفظ…' : 'راجع الباقة في السلة'),
+                  label: Text(saving ? context.tr('plans.saving') : context.tr('plans.reviewInBasket')),
                 ),
               ),
               const SizedBox(height: 24),
@@ -285,6 +286,8 @@ class _BoxPlansScreenState extends State<BoxPlansScreen> {
   );
 }
 
+const _kitItemKeys = ['kit.item.spoons', 'kit.item.scoop', 'kit.item.thermometer', 'kit.item.scale'];
+
 class KitchenKitCard extends StatelessWidget {
   const KitchenKitCard({super.key});
   @override
@@ -295,28 +298,26 @@ class KitchenKitCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'أول مرة تطبخ؟ عدّتك علينا.',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Text(
+            context.tr('plans.kit.title'),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-          const Text(kitchenKitDescription, style: TextStyle(height: 1.7)),
+          Text(context.tr('kit.description'), style: const TextStyle(height: 1.7)),
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (final item in kitchenKit)
+              for (final key in _kitItemKeys)
                 Chip(
                   avatar: const Icon(Icons.check, size: 16),
-                  label: Text(item),
+                  label: Text(context.tr(key)),
                 ),
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
-            'المقادير موزونة لكل وصفة. تحتاج في البيت أدوات الطبخ الأساسية المذكورة في الوصفة.',
-          ),
+          Text(context.tr('plans.kit.note')),
         ],
       ),
     ),

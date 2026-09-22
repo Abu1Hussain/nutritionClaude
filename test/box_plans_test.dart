@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nutrition_app/models/box_plan.dart';
 import 'package:nutrition_app/models/recipe_box.dart';
+import 'package:nutrition_app/services/app_state.dart';
 import 'package:nutrition_app/services/box_store.dart';
 import 'package:nutrition_app/screens/box_plans_screen.dart';
 import 'package:nutrition_app/screens/cooking_screen.dart';
@@ -18,14 +19,14 @@ void main() {
       final store = BoxStore(prefs);
       await store.configurePlan(BoxPlan.monthly, List.filled(5, 'shawarma'));
       expect(store.count, 20);
-      expect(store.subtotal, 128000);
-      expect(store.discount, 12800);
-      expect(store.total, 115200);
+      expect(store.subtotal, 64000);
+      expect(store.discount, 6400);
+      expect(store.total, 57600);
       final restored = BoxStore(prefs);
       expect(restored.plan, BoxPlan.monthly);
       expect(restored.includeKit, isTrue);
       await restored.placeDemoOrder('Manama', 'Tomorrow');
-      expect(restored.orders.single['total'], 115200);
+      expect(restored.orders.single['total'], 57600);
       expect(restored.orders.single['deliveries'], 4);
       expect(restored.orders.single['includeKit'], isTrue);
       expect(restored.includeKit, isFalse);
@@ -37,14 +38,14 @@ void main() {
     final store = BoxStore(prefs);
     await store.configurePlan(BoxPlan.day, ['oats', 'machboos', 'falafel']);
     await store.setIncludeKit(false);
-    expect(store.total, 17000); // 3900 + 6900 + 5200 + 1000 delivery.
+    expect(store.total, 9000); // 1950 + 3450 + 2600 + 1000 delivery.
     expect(store.discount, 0);
     expect(BoxStore(prefs).includeKit, isFalse);
   });
   test('incomplete plans cannot receive discounts or be ordered', () async {
     final store = BoxStore(await SharedPreferences.getInstance());
     await store.configurePlan(BoxPlan.weekly, List.filled(5, 'shawarma'));
-    expect(store.discount, 1600);
+    expect(store.discount, 800);
     await store.setQuantity('shawarma', 4);
     expect(store.planComplete, isFalse);
     expect(store.discount, 0);
@@ -79,8 +80,11 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final store = BoxStore(await SharedPreferences.getInstance());
     await tester.pumpWidget(
-      ChangeNotifierProvider.value(
-        value: store,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: store),
+          ChangeNotifierProvider(create: (_) => AppState()),
+        ],
         child: MaterialApp(
           theme: buildLightTheme(),
           home: MediaQuery(

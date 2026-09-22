@@ -1,12 +1,12 @@
-# Sufra | سفرة
+# NutriVision
 
-A native Flutter Arabic recipe-box storefront, built on the existing NutriVision nutrition app. Customers explore traditional dishes, review estimated calories/macros and ingredients, save favourites, and assemble boxes for home cooking.
+A native Flutter Arabic recipe-box storefront and nutrition app. Customers explore traditional dishes, review estimated calories/macros and ingredients, save favourites, and assemble boxes for home cooking.
 
 ## Meal-kit experience update
 
 - Arabic RTL storefront and five destinations: meals, plans, favourites, basket and orders.
 - Audience discovery for first-time cooks, athletes, families and balanced-meal browsing.
-- Four purchase options: one box, three-box full day, five-box week, and twenty-box/four-week month. Each box serves two. Weekly/monthly cover **one meal per day, five days per week**, not every daily meal.
+- Four purchase options: one box, three-box full day, five-box week, and twenty-box/four-week month. Each box serves one. Weekly/monthly cover **one meal per day, five days per week**, not every daily meal.
 - Editable recipe choices with a shared integer-fils pricing policy. Monthly selections repeat for four weeks; sample weekly/monthly discounts are 5%/10%.
 - Optional included starter kit: measuring spoons, scoop, food thermometer and food scale. Included with the first delivery of a selected cycle; defaults off after the first local demo order.
 - Ingredient checklist and step-by-step cooking mode; breakfast recipe added for the full-day plan.
@@ -33,9 +33,9 @@ flutter run -d chrome
 
 ## What changed
 
-- Sufra storefront in cream, olive and terracotta; mobile bottom navigation and desktop navigation rail; light/dark modes.
+- NutriVision storefront in cream, olive and terracotta; mobile bottom navigation and desktop navigation rail; light/dark modes; English/Arabic language toggle with RTL support.
 - Seven recipe boxes, including overnight oats for breakfast and six Arabic dishes: machboos, maqluba, mansaf, shawarma, mujaddara and falafel with hummus.
-- Bundled food photography, English/Arabic dish names, ingredients, recipe guidance, allergen information, cooking time, and estimated nutrition per serving and per two-serving box.
+- Bundled food photography, English/Arabic dish names, ingredients, recipe guidance, allergen information, cooking time, and estimated nutrition per serving. Each box is a single serving.
 - Search, category filters, favourites, quantity editing, sample BHD pricing, delivery totals, validated demo checkout and local order history.
 - Cart, favourites and demo orders persist with SharedPreferences.
 - Existing calculator, meal planning, targets, food search, activity and rewards remain accessible from the Nutrition tools icon in the app bar.

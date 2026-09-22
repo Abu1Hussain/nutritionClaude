@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/strings.dart';
 import '../models/recipe_box.dart';
+import '../services/app_state.dart';
 import '../services/box_store.dart';
 import '../theme.dart';
 import '../models/box_plan.dart';
@@ -15,9 +17,7 @@ Future<bool> saveAction(BuildContext context, Future<void> action) async {
   } catch (_) {
     if (context.mounted)
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تعذّر حفظ التغييرات على هذا الجهاز. حاول مرة أخرى.'),
-        ),
+        SnackBar(content: Text(context.tr('shop.errorSave'))),
       );
     return false;
   }
@@ -74,7 +74,13 @@ class MealPhoto extends StatelessWidget {
 class BoxShopScreen extends StatefulWidget {
   final bool favoritesOnly;
   final VoidCallback? onPlans;
-  const BoxShopScreen({super.key, this.favoritesOnly = false, this.onPlans});
+  final VoidCallback? onAddedToCart;
+  const BoxShopScreen({
+    super.key,
+    this.favoritesOnly = false,
+    this.onPlans,
+    this.onAddedToCart,
+  });
   @override
   State<BoxShopScreen> createState() => _BoxShopScreenState();
 }
@@ -121,9 +127,9 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'مقادير جاهزة. طبخة من يدك.',
-                                style: TextStyle(
+                              Text(
+                                context.tr('shop.tagline'),
+                                style: const TextStyle(
                                   color: Color(0xFFEBC397),
                                   fontSize: 11,
                                   letterSpacing: 2,
@@ -132,7 +138,7 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                               ),
                               const SizedBox(height: 18),
                               Text(
-                                'طبخ صحي،\nأسهل مما تتخيّل.',
+                                context.tr('shop.headline'),
                                 style: TextStyle(
                                   fontFamily: 'Outfit',
                                   fontSize: c.maxWidth > 650 ? 44 : 34,
@@ -142,20 +148,20 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              const Text(
-                                'ما تعرف تطبخ؟ أو يومك مزدحم؟ نوصل لك المقادير الموزونة، وصفة واضحة، وعدّة البداية. اختَر وجبتك وخلّ الباقي علينا.',
-                                style: TextStyle(
+                              Text(
+                                context.tr('shop.body'),
+                                style: const TextStyle(
                                   color: Color(0xFFE0E6DC),
                                   height: 1.6,
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Wrap(
+                              Wrap(
                                 spacing: 10,
                                 runSpacing: 10,
                                 children: [
-                                  Chip(label: Text('حصتان في كل بوكس')),
-                                  Chip(label: Text('مقادير + وصفة + أدوات')),
+                                  Chip(label: Text(context.tr('shop.chip.oneServing'))),
+                                  Chip(label: Text(context.tr('shop.chip.kit'))),
                                 ],
                               ),
                               if (widget.onPlans != null) ...[
@@ -163,7 +169,7 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                                 FilledButton.tonalIcon(
                                   onPressed: widget.onPlans,
                                   icon: const Icon(Icons.arrow_back),
-                                  label: const Text('اختَر باقتك'),
+                                  label: Text(context.tr('shop.choosePlan')),
                                 ),
                               ],
                             ],
@@ -205,28 +211,30 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                     ),
                   ),
                   const SizedBox(height: 22),
-                  const Wrap(
+                  Wrap(
                     spacing: 28,
                     runSpacing: 12,
                     children: [
                       _Promise(
                         Icons.shopping_basket_outlined,
-                        'مقادير موزونة بدون حيرة',
+                        context.tr('shop.promise.weighed'),
                       ),
                       _Promise(
                         Icons.monitor_heart_outlined,
-                        'سعرات وبروتين لكل حصة',
+                        context.tr('shop.promise.nutrition'),
                       ),
                       _Promise(
                         Icons.menu_book_outlined,
-                        'نتعلّم الطبخ خطوة بخطوة',
+                        context.tr('shop.promise.learn'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 36),
                 ],
                 Text(
-                  widget.favoritesOnly ? 'وجباتك المفضلة' : 'وش نطبخ اليوم؟',
+                  widget.favoritesOnly
+                      ? context.tr('shop.title.favorites')
+                      : context.tr('shop.title.today'),
                   style: const TextStyle(
                     fontFamily: 'Outfit',
                     fontSize: 28,
@@ -235,7 +243,7 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'نكهات نحبها، وخيارات تناسب يومك • أسعار تجريبية بالدينار البحريني',
+                  context.tr('shop.subtitle'),
                   style: TextStyle(color: context.palette.textMuted),
                 ),
                 const SizedBox(height: 18),
@@ -251,7 +259,13 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                       'وجبة متوازنة',
                     ])
                       ChoiceChip(
-                        label: Text(a),
+                        label: Text(context.tr(switch (a) {
+                          'أول مرة أطبخ' => 'audience.beginner',
+                          'للرياضيين' => 'audience.athletes',
+                          'سفرة العائلة' => 'audience.family',
+                          'وجبة متوازنة' => 'audience.balanced',
+                          _ => 'audience.all',
+                        })),
                         selected: audience == a,
                         onSelected: (_) => setState(() => audience = a),
                       ),
@@ -260,20 +274,19 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                 if (audience != 'الكل')
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
-                    child: Text(switch (audience) {
-                      'أول مرة أطبخ' => 'وصفات حتى ٣٠ دقيقة. افتح الوصفة وابدأ وضع الطبخ خطوة بخطوة.',
-                      'للرياضيين' =>
-                        '٣٥ غ بروتين أو أكثر للحصة؛ اختَر ما يناسب احتياجك.',
-                      'سفرة العائلة' => 'كل بوكس يكفي شخصين؛ زِد الكمية في السلة حسب عدد أفراد البيت.',
-                      _ => '٢٠ غ بروتين أو أكثر وحتى ٧٠٠ سعرة للحصة. القيم تقديرية وليست توصية شخصية.',
-                    }),
+                    child: Text(context.tr(switch (audience) {
+                      'أول مرة أطبخ' => 'audience.desc.beginner',
+                      'للرياضيين' => 'audience.desc.athletes',
+                      'سفرة العائلة' => 'audience.desc.family',
+                      _ => 'audience.desc.balanced',
+                    })),
                   ),
                 const SizedBox(height: 22),
                 TextField(
                   onChanged: (v) => setState(() => query = v),
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'ابحث عن وجبة أو نكهة تحبها…',
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    hintText: context.tr('shop.searchHint'),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -290,13 +303,13 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                     ])
                       ChoiceChip(
                         label: Text(
-                          {
-                            'All boxes': 'كل الوجبات',
-                            'Breakfast': 'فطور',
-                            'Chicken': 'دجاج',
-                            'Meat': 'لحوم',
-                            'Plant-based': 'نباتي',
-                          }[c]!,
+                          context.tr({
+                            'All boxes': 'category.all',
+                            'Breakfast': 'category.breakfast',
+                            'Chicken': 'category.chicken',
+                            'Meat': 'category.meat',
+                            'Plant-based': 'category.plant',
+                          }[c]!),
                         ),
                         selected: category == c,
                         onSelected: (_) => setState(() => category = c),
@@ -305,11 +318,9 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                 ),
                 const SizedBox(height: 24),
                 if (boxes.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: Text(
-                      'ما لقينا وجبات هنا. جرّب بحثًا آخر أو أضف وجبة للمفضلة.',
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Text(context.tr('shop.empty')),
                   ),
                 LayoutBuilder(
                   builder: (context, c) {
@@ -324,7 +335,10 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                       runSpacing: 20,
                       children: [
                         for (final box in boxes)
-                          SizedBox(width: width, child: _BoxCard(box)),
+                          SizedBox(
+                            width: width,
+                            child: _BoxCard(box, onAddedToCart: widget.onAddedToCart),
+                          ),
                       ],
                     );
                   },
@@ -333,7 +347,7 @@ class _BoxShopScreenState extends State<BoxShopScreen> {
                 if (!widget.favoritesOnly) const KitchenKitCard(),
                 const SizedBox(height: 24),
                 Text(
-                  'Nutrition values are illustrative estimates per serving. Photos are AI-generated serving suggestions. Final recipes, allergens and prices need supplier verification.',
+                  context.tr('shop.disclaimer'),
                   style: TextStyle(
                     fontSize: 12,
                     color: context.palette.textMuted,
@@ -365,7 +379,8 @@ class _Promise extends StatelessWidget {
 
 class _BoxCard extends StatelessWidget {
   final RecipeBox box;
-  const _BoxCard(this.box);
+  final VoidCallback? onAddedToCart;
+  const _BoxCard(this.box, {this.onAddedToCart});
   @override
   Widget build(BuildContext context) {
     final store = context.watch<BoxStore>();
@@ -378,7 +393,7 @@ class _BoxCard extends StatelessWidget {
           Stack(
             children: [
               InkWell(
-                onTap: () => _openDetails(context, box),
+                onTap: () => _openDetails(context, box, onAddedToCart),
                 child: MealPhoto(box),
               ),
               Positioned(
@@ -450,16 +465,16 @@ class _BoxCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const Text(
-                            'للبوكس • يكفي شخصين',
-                            style: TextStyle(fontSize: 11),
+                          Text(
+                            context.tr('box.perBox'),
+                            style: const TextStyle(fontSize: 11),
                           ),
                         ],
                       ),
                     ),
                     FilledButton(
-                      onPressed: () => _openDetails(context, box),
-                      child: const Text('شوف الوصفة'),
+                      onPressed: () => _openDetails(context, box, onAddedToCart),
+                      child: Text(context.tr('box.viewRecipe')),
                     ),
                   ],
                 ),
@@ -516,19 +531,26 @@ class NutritionStrip extends StatelessWidget {
   );
 }
 
-void _openDetails(BuildContext context, RecipeBox box) =>
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: BoxDetailScreen(box: box),
-        ),
+void _openDetails(
+  BuildContext context,
+  RecipeBox box, [
+  VoidCallback? onAddedToCart,
+]) {
+  final language = context.read<AppState>().language;
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => Directionality(
+        textDirection: language == AppLanguage.ar ? TextDirection.rtl : TextDirection.ltr,
+        child: BoxDetailScreen(box: box, onAddedToCart: onAddedToCart),
       ),
-    );
+    ),
+  );
+}
 
 class BoxDetailScreen extends StatelessWidget {
   final RecipeBox box;
-  const BoxDetailScreen({super.key, required this.box});
+  final VoidCallback? onAddedToCart;
+  const BoxDetailScreen({super.key, required this.box, this.onAddedToCart});
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(box.name)),
@@ -565,23 +587,19 @@ class BoxDetailScreen extends StatelessWidget {
                 Text(box.description, style: const TextStyle(height: 1.7)),
                 const SizedBox(height: 16),
                 Text(
-                  '${box.minutes} minutes • 2 servings • ${money(box.priceFils)} / box',
+                  '${box.minutes} minutes • 1 serving • ${money(box.priceFils)} / box',
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'القيم التقديرية للحصة الواحدة',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  context.tr('detail.perServingValues'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 NutritionStrip(box),
-                const SizedBox(height: 10),
-                Text(
-                  'Whole box: ${box.calories * 2} kcal • ${box.protein * 2}g protein • ${box.carbs * 2}g carbs • ${box.fat * 2}g fat',
-                ),
                 const SizedBox(height: 24),
-                const Text(
-                  'مقادير البوكس',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                Text(
+                  context.tr('detail.ingredients'),
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 for (final ingredient in box.ingredients)
                   ListTile(
@@ -603,12 +621,12 @@ class BoxDetailScreen extends StatelessWidget {
                     ),
                   ),
                   icon: const Icon(Icons.play_circle_outline),
-                  label: const Text('ابدأ الطبخ خطوة بخطوة'),
+                  label: Text(context.tr('detail.startCooking')),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'من البوكس إلى السفرة',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                Text(
+                  context.tr('detail.fromBoxToTable'),
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 for (var i = 0; i < box.steps.length; i++)
                   ListTile(
@@ -617,16 +635,16 @@ class BoxDetailScreen extends StatelessWidget {
                     title: Text(box.steps[i]),
                   ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Sample recipe guidance and nutrition; verify final quantities and cooking instructions before commercial use.',
-                  style: TextStyle(fontSize: 12),
+                Text(
+                  context.tr('detail.sampleGuidance'),
+                  style: const TextStyle(fontSize: 12),
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
                     icon: const Icon(Icons.add_shopping_cart),
-                    label: Text('أضف للسلة · ${money(box.priceFils)}'),
+                    label: Text('${context.tr('detail.addToBasket')} · ${money(box.priceFils)}'),
                     onPressed: () async {
                       final store = context.read<BoxStore>();
                       final saved = await saveAction(
@@ -636,12 +654,10 @@ class BoxDetailScreen extends StatelessWidget {
                           (store.cart[box.id] ?? 0) + 1,
                         ),
                       );
-                      if (saved && context.mounted)
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${box.name} is in your basket'),
-                          ),
-                        );
+                      if (saved && context.mounted) {
+                        Navigator.of(context).pop();
+                        onAddedToCart?.call();
+                      }
                     },
                   ),
                 ),
@@ -660,6 +676,7 @@ class BasketScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<BoxStore>();
+    final language = context.watch<AppState>().language;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -668,25 +685,25 @@ class BasketScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'سلتك، على ذوقك',
-                style: TextStyle(
+              Text(
+                context.tr('basket.title'),
+                style: const TextStyle(
                   fontFamily: 'Outfit',
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text('كل بوكس يشمل المقادير والوصفة لشخصين.'),
+              Text(context.tr('basket.subtitle')),
               const SizedBox(height: 24),
               if (store.count == 0) ...[
-                const Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text('سلتك فاضية. اختَر وجبة تعجبك ونجهّز مقاديرها.'),
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(context.tr('basket.empty')),
                 ),
                 FilledButton(
                   onPressed: onBrowse,
-                  child: const Text('تصفّح الوجبات'),
+                  child: Text(context.tr('basket.browse')),
                 ),
               ],
               for (final box in recipeBoxes.where(
@@ -729,7 +746,7 @@ class BasketScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             IconButton(
-                              tooltip: 'Remove one ${box.name}',
+                              tooltip: '${context.tr('basket.removeOne')} ${box.name}',
                               onPressed: () => saveAction(
                                 context,
                                 store.setQuantity(
@@ -741,7 +758,7 @@ class BasketScreen extends StatelessWidget {
                             ),
                             Text('${store.cart[box.id]}'),
                             IconButton(
-                              tooltip: 'Add one ${box.name}',
+                              tooltip: '${context.tr('basket.addOne')} ${box.name}',
                               onPressed: store.cart[box.id]! >= 20
                                   ? null
                                   : () => saveAction(
@@ -769,33 +786,36 @@ class BasketScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${store.count} بوكس • ${store.count * 2} حصة • ${store.plan.deliveries} توصيل',
+                  context
+                      .tr('basket.summary')
+                      .replaceAll('{count}', '${store.count}')
+                      .replaceAll('{deliveries}', '${store.plan.deliveries}'),
                 ),
                 if (!store.planComplete) ...[
                   Text(
-                    'هذه الباقة تتطلب ${store.plan.boxes} بوكس. عدّل الكمية أو حوّل السلة إلى شراء منفرد.',
+                    context.tr('basket.planIncomplete').replaceAll('{n}', '${store.plan.boxes}'),
                   ),
                   TextButton(
                     onPressed: () => saveAction(context, store.useSinglePlan()),
-                    child: const Text('تحويل إلى شراء منفرد'),
+                    child: Text(context.tr('basket.convertSingle')),
                   ),
                 ],
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('أضف طقم البداية مجانًا'),
-                  subtitle: const Text(kitchenKitDescription),
+                  title: Text(context.tr('basket.includeKit')),
+                  subtitle: Text(
+                    language == AppLanguage.en ? context.tr('kit.description') : kitchenKitDescription,
+                  ),
                   value: store.includeKit,
                   onChanged: (v) => saveAction(context, store.setIncludeKit(v)),
                 ),
-                _price('الوجبات (${store.count})', store.subtotal),
-                if (store.discount > 0) _price('خصم الباقة', -store.discount),
-                _price('التوصيل', store.delivery),
+                _price('${context.tr('basket.lineMeals')} (${store.count})', store.subtotal),
+                if (store.discount > 0) _price(context.tr('basket.lineDiscount'), -store.discount),
+                _price(context.tr('basket.lineDelivery'), store.delivery),
                 const Divider(),
-                _price('الإجمالي', store.total),
+                _price(context.tr('basket.lineTotal'), store.total),
                 const SizedBox(height: 12),
-                const Text(
-                  'توصيل تجريبي: دينار لكل توصيل، مجانًا للباقة إذا بلغ مجموع وجباتها ٢٠ دينارًا قبل الخصم.',
-                ),
+                Text(context.tr('basket.deliveryNote')),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
@@ -804,13 +824,13 @@ class BasketScreen extends StatelessWidget {
                         ? null
                         : () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => const Directionality(
-                                textDirection: TextDirection.rtl,
-                                child: CheckoutScreen(),
+                              builder: (_) => Directionality(
+                                textDirection: language == AppLanguage.ar ? TextDirection.rtl : TextDirection.ltr,
+                                child: const CheckoutScreen(),
                               ),
                             ),
                           ),
-                    child: const Text('متابعة الطلب التجريبي'),
+                    child: Text(context.tr('basket.checkoutCta')),
                   ),
                 ),
               ],
@@ -838,13 +858,18 @@ class CheckoutScreen extends StatefulWidget {
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
+const _checkoutSlots = ['slot1', 'slot2', 'slot3'];
+
+String slotLabel(BuildContext context, String slot) =>
+    _checkoutSlots.contains(slot) ? context.tr('checkout.$slot') : slot;
+
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _form = GlobalKey<FormState>();
-  String area = '', slot = 'غدًا · ٤–٧ مساءً';
+  String area = '', slot = 'slot1';
   bool saving = false;
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('مراجعة الطلب التجريبي')),
+    appBar: AppBar(title: Text(context.tr('checkout.title'))),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -855,59 +880,54 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'باقي خطوة على تجربتك الأولى',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                Text(
+                  context.tr('checkout.headline'),
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'هذا طلب تجريبي محفوظ على جهازك فقط. لا يتم الدفع أو إرسال الطلب أو حجز التوصيل. استخدم منطقة افتراضية؛ لا نحتاج بياناتك الشخصية.',
-                ),
+                Text(context.tr('checkout.disclaimer')),
                 const SizedBox(height: 24),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'منطقة التوصيل (تجريبية)',
-                    hintText: 'مثال: المنامة',
+                  decoration: InputDecoration(
+                    labelText: context.tr('checkout.areaLabel'),
+                    hintText: context.tr('checkout.areaHint'),
                   ),
                   maxLength: 80,
                   onSaved: (v) => area = v!.trim(),
                   validator: (v) =>
-                      (v?.trim().length ?? 0) < 2 ? 'أدخل منطقة التوصيل' : null,
+                      (v?.trim().length ?? 0) < 2 ? context.tr('checkout.areaValidator') : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: slot,
                   isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: 'موعد أول توصيل (تجريبي)',
+                  decoration: InputDecoration(
+                    labelText: context.tr('checkout.slotLabel'),
                   ),
                   items: [
-                    for (final s in [
-                      'غدًا · ٤–٧ مساءً',
-                      'غدًا · ٧–١٠ مساءً',
-                      'بعد يومين · ٤–٧ مساءً',
-                    ])
-                      DropdownMenuItem(value: s, child: Text(s)),
+                    for (final s in _checkoutSlots)
+                      DropdownMenuItem(value: s, child: Text(slotLabel(context, s))),
                   ],
                   onChanged: (v) => setState(() => slot = v!),
                 ),
                 const SizedBox(height: 20),
-                Text('الباقة: ${context.watch<BoxStore>().plan.title}'),
+                Text('${context.tr('checkout.planLabel')}: ${context.watch<BoxStore>().plan.title}'),
                 Text(
-                  '${context.watch<BoxStore>().count} بوكس • ${context.watch<BoxStore>().plan.deliveries} توصيل',
+                  context
+                      .tr('checkout.deliveryLine')
+                      .replaceAll('{count}', '${context.watch<BoxStore>().count}')
+                      .replaceAll('{deliveries}', '${context.watch<BoxStore>().plan.deliveries}'),
                 ),
                 Text(
                   context.watch<BoxStore>().includeKit
-                      ? 'طقم البداية مشمول في أول توصيل'
-                      : 'بدون طقم أدوات',
+                      ? context.tr('checkout.kitIncluded')
+                      : context.tr('checkout.kitNotIncluded'),
                 ),
                 if (context.watch<BoxStore>().plan.isSubscription)
-                  const Text(
-                    'باقة تجريبية لمدة محددة، بدون تجديد تلقائي. الموعد المختار لأول توصيل؛ الجدولة اللاحقة تحتاج خدمة توصيل فعلية.',
-                  ),
+                  Text(context.tr('checkout.subscriptionNote')),
                 const SizedBox(height: 24),
                 Text(
-                  'الإجمالي: ${money(context.watch<BoxStore>().total)}',
+                  '${context.tr('checkout.total')}: ${money(context.watch<BoxStore>().total)}',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -934,14 +954,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               context: context,
                               barrierDismissible: false,
                               builder: (c) => AlertDialog(
-                                title: const Text('تم حفظ الطلب التجريبي'),
-                                content: const Text(
-                                  'ستجد الطلب في «طلباتي» على هذا الجهاز. لم يتم حجز توصيل أو تحصيل أي مبلغ.',
-                                ),
+                                title: Text(context.tr('checkout.savedTitle')),
+                                content: Text(context.tr('checkout.savedBody')),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(c),
-                                    child: const Text('تم'),
+                                    child: Text(context.tr('checkout.done')),
                                   ),
                                 ],
                               ),
@@ -950,17 +968,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           } catch (_) {
                             if (context.mounted)
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'تعذّر حفظ الطلب. محتويات السلة موجودة؛ حاول مرة أخرى.',
-                                  ),
-                                ),
+                                SnackBar(content: Text(context.tr('checkout.errorSave'))),
                               );
                           } finally {
                             if (mounted) setState(() => saving = false);
                           }
                         },
-                  child: Text(saving ? 'جارٍ الحفظ…' : 'حفظ الطلب التجريبي'),
+                  child: Text(saving ? context.tr('checkout.saving') : context.tr('checkout.save')),
                 ),
               ],
             ),
@@ -979,17 +993,14 @@ class BoxOrdersScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          'طلباتك',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        Text(
+          context.tr('orders.title'),
+          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'طلبات تجريبية محفوظة على هذا الجهاز؛ لا يوجد تتبّع توصيل فعلي.',
-        ),
+        Text(context.tr('orders.subtitle')),
         const SizedBox(height: 24),
-        if (orders.isEmpty)
-          const Text('أول طبخة تبدأ من هنا. تصفّح الوجبات أو اختَر باقتك.'),
+        if (orders.isEmpty) Text(context.tr('orders.empty')),
         for (final order in orders)
           Card(
             child: Padding(
@@ -997,7 +1008,7 @@ class BoxOrdersScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Chip(label: Text('تجريبي • محفوظ على الجهاز')),
+                  Chip(label: Text(context.tr('orders.sampleChip'))),
                   Text(
                     '${order['id']}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -1009,12 +1020,12 @@ class BoxOrdersScreen extends StatelessWidget {
                   ))
                     Text('${(order['items'] as Map)[box.id]} × ${box.name}'),
                   Text(
-                    '${order['planTitle'] ?? 'وجبات منفردة'} • ${order['deliveries'] ?? 1} توصيل',
+                    '${order['planTitle'] ?? context.tr('orders.singleMeals')} • ${order['deliveries'] ?? 1}',
                   ),
                   if (order['includeKit'] == true)
-                    const Text('يشمل طقم البداية'),
+                    Text(context.tr('orders.kitIncluded')),
                   const SizedBox(height: 12),
-                  Text('${order['area']} • ${order['slot']}'),
+                  Text('${order['area']} • ${slotLabel(context, '${order['slot']}')}'),
                   Text(
                     money(order['total'] as int),
                     style: const TextStyle(fontWeight: FontWeight.bold),

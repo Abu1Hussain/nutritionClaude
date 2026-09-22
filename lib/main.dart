@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'l10n/strings.dart';
 import 'services/box_store.dart';
 import 'screens/box_shop_screen.dart';
 import 'screens/box_plans_screen.dart';
@@ -74,7 +76,7 @@ class _NutriVisionRootState extends State<NutriVisionRoot> {
         }
         if (!snapshot.hasData) {
           return MaterialApp(
-            title: 'NutriVision | سفرة',
+            title: 'NutriVision',
             debugShowCheckedModeBanner: false,
             theme: buildDarkTheme(),
             home: const _LoadingScreen(),
@@ -88,11 +90,18 @@ class _NutriVisionRootState extends State<NutriVisionRoot> {
           ],
           child: Consumer<AppState>(
             builder: (context, appState, _) => MaterialApp(
-              title: 'NutriVision | سفرة',
+              title: 'NutriVision',
               debugShowCheckedModeBanner: false,
               theme: buildLightTheme(),
               darkTheme: buildDarkTheme(),
               themeMode: appState.themeMode,
+              locale: Locale(appState.language == AppLanguage.ar ? 'ar' : 'en'),
+              supportedLocales: const [Locale('en'), Locale('ar')],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
               home: _ShopShell(foodRepo: foodRepo),
             ),
           ),
@@ -198,25 +207,29 @@ class _ShopShellState extends State<_ShopShell> {
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final count = context.watch<BoxStore>().count;
+    void goToBasket() => setState(() => index = 3);
     final screens = <Widget>[
-      BoxShopScreen(onPlans: () => setState(() => index = 1)),
-      BoxPlansScreen(onBasket: () => setState(() => index = 3)),
-      const BoxShopScreen(favoritesOnly: true),
+      BoxShopScreen(
+        onPlans: () => setState(() => index = 1),
+        onAddedToCart: goToBasket,
+      ),
+      BoxPlansScreen(onBasket: goToBasket),
+      BoxShopScreen(favoritesOnly: true, onAddedToCart: goToBasket),
       BasketScreen(onBrowse: () => setState(() => index = 0)),
       const BoxOrdersScreen(),
     ];
     final destinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.restaurant_menu),
-        label: 'الوجبات',
+      NavigationDestination(
+        icon: const Icon(Icons.restaurant_menu),
+        label: context.tr('nav.meals'),
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        label: 'الباقات',
+      NavigationDestination(
+        icon: const Icon(Icons.calendar_month_outlined),
+        label: context.tr('nav.plans'),
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.favorite_border),
-        label: 'المفضلة',
+      NavigationDestination(
+        icon: const Icon(Icons.favorite_border),
+        label: context.tr('nav.favorites'),
       ),
       NavigationDestination(
         icon: Badge(
@@ -224,19 +237,19 @@ class _ShopShellState extends State<_ShopShell> {
           label: Text('$count'),
           child: const Icon(Icons.shopping_bag_outlined),
         ),
-        label: 'السلة',
+        label: context.tr('nav.basket'),
       ),
-      const NavigationDestination(
-        icon: Icon(Icons.receipt_long_outlined),
-        label: 'طلباتي',
+      NavigationDestination(
+        icon: const Icon(Icons.receipt_long_outlined),
+        label: context.tr('nav.orders'),
       ),
     ];
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: state.language == AppLanguage.ar ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            'sufra / سفرة',
+            'NutriVision',
             style: TextStyle(
               fontFamily: 'Outfit',
               fontWeight: FontWeight.w600,
@@ -245,7 +258,7 @@ class _ShopShellState extends State<_ShopShell> {
           ),
           actions: [
             IconButton(
-              tooltip: 'Nutrition tools',
+              tooltip: context.tr('appbar.nutritionTools'),
               icon: const Icon(Icons.monitor_heart_outlined),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -254,9 +267,25 @@ class _ShopShellState extends State<_ShopShell> {
               ),
             ),
             IconButton(
+              tooltip: context.tr('appbar.basket'),
+              icon: Badge(
+                isLabelVisible: count > 0,
+                label: Text('$count'),
+                child: const Icon(Icons.shopping_bag_outlined),
+              ),
+              onPressed: goToBasket,
+            ),
+            IconButton(
+              tooltip: state.language == AppLanguage.ar
+                  ? context.tr('appbar.switchToEnglish')
+                  : context.tr('appbar.switchToArabic'),
+              icon: const Icon(Icons.translate),
+              onPressed: state.toggleLanguage,
+            ),
+            IconButton(
               tooltip: state.themeMode == ThemeMode.dark
-                  ? 'Switch to light mode'
-                  : 'Switch to dark mode',
+                  ? context.tr('appbar.switchToLight')
+                  : context.tr('appbar.switchToDark'),
               icon: Icon(
                 state.themeMode == ThemeMode.dark
                     ? Icons.light_mode_outlined
