@@ -1,0 +1,19 @@
+# Standard Flutter .gitignore
+
+# Flutter/Dart files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS metadata
+.DS_Store
+Thumbs.db

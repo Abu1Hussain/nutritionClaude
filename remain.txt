@@ -1,0 +1,31 @@
+clone this: SHSALI/Nutrition.git, i want u to edit the app, like i want u to add images for the rewards section add an images for each section of cards, also i want u to make the target track-able and linked to the real steps of the person (so link the steps in the device like ios or andriod to the app so it can get the real steps of the person) also i want u to make sure that the home page will really live steps that the user has walk, also this is the remaining part:
+
+From your idea list — not yet built:
+
+
+
+Smart breakfast default from history (eggs 7+ days → auto-default, still editable) — the biggest of the four, since meals are currently fixed recipes, not swappable ingredients. Would need a "pick your ingredients" system first, then history tracking on top.
+
+Real wearable/Health-app step sync — still just honest manual entry + a disclaimer, by design (flagged earlier: needs native HealthKit/Google Fit code I can't verify without a real iOS/Android device).
+
+A gap I should flag: web app vs. Flutter app have drifted apart. The weekly-calorie-target view and the editable/auto-rebalancing meal plan only exist in the Flutter app — I never backported them to index.html/app.js. If you still care about the web version, it needs those two features too, or you tell me to treat Flutter as the one true version going forward and let the web app be retired/reference-only.
+
+
+
+Things I couldn't verify end-to-end, only by proxy:
+
+
+
+No Android SDK or Visual Studio in this environment, so flutter analyze/flutter test/flutter build web all pass cleanly, but I've never actually run the app as a real Android APK, iOS app, or Windows .exe — only inferred correctness from the shared Dart logic and the successful web build.
+
+No custom app icon — iOS/Android/Windows all still use Flutter's default template icon, just the app name was changed.
+
+Housekeeping:
+
+
+
+Nothing is committed to git yet — 45 files changed/added sitting uncommitted.
+
+What do you want to tackle — one of the two open ideas, closing the web/Flutter gap, or should I just commit what's here first?
+
+, and i want u to change the color and the design of the app, and i want u to make the app to be flexible to the screen of each device (like if the app opened on a tab or pc or any other device), also i want u to fix the buttons : (home , calculator , meal plan and other to be at the bottom of the app)  and make sure that it will be suitable with the devices, act as an expert en improving this app 
