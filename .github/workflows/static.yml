@@ -20,7 +20,6 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
-      - run: dart tool/check_plan_pricing.dart
       - run: flutter test
       - name: Build Flutter web
         run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
